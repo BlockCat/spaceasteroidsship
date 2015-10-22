@@ -24,18 +24,10 @@ maxSpeed = 19
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-<<<<<<< HEAD
-timeHandler time world@(World {player, rotateAction, movementAction, bullets, shootAction, ..}) = do
-        let p1 = rotatePlayer player rotateAction
-        let p2 = movePlayer p1 movementAction
-        let p3 = wrapPlayer p2 (800, 640)
-        let newPlayer  = updatePlayer p3      
-        let newBullets = updateBullets shootAction player bullets
-        world {player = newPlayer, bullets = newBullets}
-=======
-timeHandler time world@(World {..}) = do                      
+timeHandler time world@(World {..}) = do 
         let updatedPlayer = updatePlayer world
-        world {player = updatedPlayer}
+        let newBullets = updateBullets shootAction player bullets
+        world {player = updatedPlayer, bullets = newBullets}
         
 updatePlayer :: World -> Player
 updatePlayer world@(World{..}) = 
@@ -44,7 +36,6 @@ updatePlayer world@(World{..}) =
     let p2 = movePlayer p1 movementAction
     let p3 = wrapPlayer p2 (800, 640)
     p3 {playerLocation = playerLocation p3 + playerSpeed p3}
->>>>>>> origin/master
 
         
 rotatePlayer :: Player -> RotateAction -> Player
@@ -67,13 +58,9 @@ wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (
     where wrap low high x | x < low  = high
                           | x > high = low
                           | otherwise = x
-    
-<<<<<<< HEAD
-updatePlayer :: Player -> Player
-updatePlayer player@(Player {x, y, dx, dy}) = player {x = x+dx, y=y+dy}
 
 updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
-updateBullets Shoot player@(Player {x, y, dx, dy}) bs = let b = Bullet x y dx dy in b:bs
+updateBullets Shoot player@(Player {..}) bs = let b = Bullet x y dx dy in b:bs
+    where (x,y)    = playerLocation
+          (dx, dy) = playerSpeed
 updateBullets _ _ bs = bs
-=======
->>>>>>> origin/master

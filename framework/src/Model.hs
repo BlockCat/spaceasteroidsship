@@ -41,10 +41,6 @@ data ShootAction    = Shoot      | DontShoot
 
 initial :: Int -> World
 initial seed = World (mkStdGen seed) NoRotation NoMovement DontShoot player emptyList
-    where 
-<<<<<<< HEAD
-    player = Player {x = 100, y = 100, dx = 0, dy = 0, direction = 0}
-    emptyList = []
-=======
+    where     
     player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
->>>>>>> origin/master
+    emptyList = []
