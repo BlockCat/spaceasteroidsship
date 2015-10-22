@@ -23,12 +23,13 @@ maxSpeed = 19
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {player, rotateAction, movementAction, ..}) = do
+timeHandler time world@(World {player, rotateAction, movementAction, bullets, shootAction, ..}) = do
         let p1 = rotatePlayer player rotateAction
         let p2 = movePlayer p1 movementAction
         let p3 = wrapPlayer p2 (800, 640)
-        let newPlayer = updatePlayer p3        
-        world {player = newPlayer}
+        let newPlayer  = updatePlayer p3      
+        let newBullets = updateBullets shootAction player bullets
+        world {player = newPlayer, bullets = newBullets}
 
         
 rotatePlayer :: Player -> RotateAction -> Player
@@ -60,3 +61,7 @@ wrapPlayer player@(Player {x, y}) (w, h) = player { x = wrap (-450) 450 x, y = w
     
 updatePlayer :: Player -> Player
 updatePlayer player@(Player {x, y, dx, dy}) = player {x = x+dx, y=y+dy}
+
+updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
+updateBullets Shoot player@(Player {x, y, dx, dy}) bs = let b = Bullet x y dx dy in b:bs
+updateBullets _ _ bs = bs

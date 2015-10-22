@@ -12,12 +12,12 @@ import Model
 -- | Drawing
 
 draw :: Float -> Float -> World -> Picture
-draw horizontalResolution verticalResolution world@(World{player, ..})
-    = Pictures [(drawPlayer player)]
+draw horizontalResolution verticalResolution world@(World{player, bullets, ..})
+    = Pictures $ [drawPlayer player] ++ map drawShoot bullets
     
 drawPlayer :: Player -> Picture
-drawPlayer player@(Player {x, y, direction}) = translate (x) (y) $ pictures [(color red fillTriangleL), (color red fillTriangleR),(color white bodyTriangle1), (color blue bodyTriangle2), (color red lowerShootTriangleR), 
-                  (color red lowerShootTriangleL), (color red shootRectR), (color red shootRectL), (color red upperShootTriangleR), (color red upperShootTriangleL), (color grey lowerShootTriangleR2), (color grey lowerShootTriangleL2), (color grey upperShootTriangleR2), (color grey upperShootTriangleL2)]
+drawPlayer player@(Player {x, y, direction}) = translate x y $ pictures [color red fillTriangleL, color red fillTriangleR, color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, color red lowerShootTriangleL,
+                    color red shootRectR, color red shootRectL, color red upperShootTriangleR, color red upperShootTriangleL, color grey lowerShootTriangleR2, color grey lowerShootTriangleL2, color grey upperShootTriangleR2, color grey upperShootTriangleL2]
     where 
     fillTriangleR        = rotate (90-direction :: Float)  $ polygon       [(35, -20), (40, -20), (35, -10)]
     fillTriangleL        = rotate (90-direction :: Float)  $ polygon       [(-40, -20), (-35, -20), (-35, -10)]
@@ -34,8 +34,15 @@ drawPlayer player@(Player {x, y, direction}) = translate (x) (y) $ pictures [(co
     upperShootTriangleR2 = rotate (90-direction :: Float)  $ polygon       [(37, -3), (43, -3), (40, 15)]
     upperShootTriangleL2 = rotate (90-direction :: Float)  $ polygon       [(-43, -3), (-37, -3), (-40, 15)]
     
-    grey                 = greyN (0.4)
+    grey                 = greyN 0.4
     
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture
-drawRectangle x y width = (translate x y) . rectangleSolid width
+drawRectangle x y width = translate x y . rectangleSolid width
+
+drawShoot :: Bullet -> Picture
+drawShoot Bullet{bulletX, bulletY, ..} = (color yellow . translate bulletX bulletY . circleSolid) 3
+{-
+drawShootReal :: ShootAction -> Player -> Picture
+drawShootReal Shoot (Player {x, y, direction}) = drawShoot x y
+drawShootReal _ _ = blank -}
