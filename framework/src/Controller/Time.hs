@@ -7,7 +7,8 @@ module Controller.Time (
 
 import Control.Arrow ((>>>))
 import Data.Fixed (mod')
-
+import Graphics.Gloss.Data.Vector
+import Graphics.Gloss.Data.Point
 import Data.List
 
 import Graphics.Gloss
@@ -23,12 +24,17 @@ maxSpeed = 19
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {player, rotateAction, movementAction, ..}) = do
-        let p1 = rotatePlayer player rotateAction
-        let p2 = movePlayer p1 movementAction
-        let p3 = wrapPlayer p2 (800, 640)
-        let newPlayer = updatePlayer p3        
-        world {player = newPlayer}
+timeHandler time world@(World {..}) = do                      
+        let updatedPlayer = updatePlayer world
+        world {player = updatedPlayer}
+        
+updatePlayer :: World -> Player
+updatePlayer world@(World{..}) = 
+    do
+    let p1 = rotatePlayer player rotateAction
+    let p2 = movePlayer p1 movementAction
+    let p3 = wrapPlayer p2 (800, 640)
+    p3 {playerLocation = playerLocation p3 + playerSpeed p3}
 
         
 rotatePlayer :: Player -> RotateAction -> Player
@@ -37,26 +43,18 @@ rotatePlayer player RotateLeft  = player {direction = (direction player) + rotat
 rotatePlayer player RotateRight = player {direction = (direction player) - rotationSpeed}
 
 movePlayer :: Player -> MovementAction -> Player
-movePlayer player@(Player {dx, dy, direction}) NoMovement = player {dx = dx *0.95, dy = dy *0.95}
-movePlayer player@(Player {dx, dy, direction}) Thrust =
+movePlayer player@(Player {playerSpeed, direction}) NoMovement = player {playerSpeed = playerSpeed * (0.96, 0.96)}
+movePlayer player@(Player {playerSpeed, direction}) Thrust =
         do 
-        let dx1 = dx * 0.97 + cos (direction * pi / 180) * 0.6
-        let dy1 = dy * 0.97 + sin (direction * pi / 180) * 0.6
-        let maxSpeedReached = (totalSpeedSquared dx1 dy1) >= (maxSpeed * maxSpeed)
-        let dx2 = if maxSpeedReached then dx else dx1
-        let dy2 = if maxSpeedReached then dy else dy1        
-        player {dx = dx2, dy = dy2}
-
-    where
-    --clipSpeed df a      = (df/ totalSpeedSquared df a) * maxSpeed
-    clipSpeed df a      = df --(df/ maxSpeed) -- * maxSpeed
-    totalSpeedSquared dx' dy' = (dx' * dx') + (dy' * dy')
+        let sp1 = playerSpeed * (0.97, 0.97) + rotateV (direction * pi / 180) (0.6, 0)        
+        let maxSpeedReached = magV sp1 >= maxSpeed
+        let newSpeed = if (maxSpeedReached) then rotateV (direction * pi / 180) (maxSpeed, 0) else sp1
+        player {playerSpeed = newSpeed}
+    
 
 wrapPlayer :: Player -> (Int, Int) -> Player
-wrapPlayer player@(Player {x, y}) (w, h) = player { x = wrap (-450) 450 x, y = wrap (-320) 320 y}
+wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (wrap (-450) 450 (fst playerLocation), wrap (-320) 320 (snd playerLocation))}
     where wrap low high x | x < low  = high
                           | x > high = low
                           | otherwise = x
     
-updatePlayer :: Player -> Player
-updatePlayer player@(Player {x, y, dx, dy}) = player {x = x+dx, y=y+dy}

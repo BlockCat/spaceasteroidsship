@@ -16,7 +16,7 @@ draw horizontalResolution verticalResolution world@(World{player, ..})
     = Pictures [(drawPlayer player)]
     
 drawPlayer :: Player -> Picture
-drawPlayer player@(Player {x, y, direction}) = translate (x) (y) $ pictures [(color red fillTriangleL), (color red fillTriangleR),(color white bodyTriangle1), (color blue bodyTriangle2), (color red lowerShootTriangleR), 
+drawPlayer player@(Player {playerLocation, direction}) = translate (fst playerLocation) (snd playerLocation) $ scale 0.4 0.4 $ pictures [(color red fillTriangleL), (color red fillTriangleR),(color white bodyTriangle1), (color blue bodyTriangle2), (color red lowerShootTriangleR), 
                   (color red lowerShootTriangleL), (color red shootRectR), (color red shootRectL), (color red upperShootTriangleR), (color red upperShootTriangleL), (color grey lowerShootTriangleR2), (color grey lowerShootTriangleL2), (color grey upperShootTriangleR2), (color grey upperShootTriangleL2)]
     where 
     fillTriangleR        = rotate (90-direction :: Float)  $ polygon       [(35, -20), (40, -20), (35, -10)]
