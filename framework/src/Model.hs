@@ -3,6 +3,8 @@
 module Model where
 
 import System.Random
+import Graphics.Gloss.Data.Vector
+import Graphics.Gloss.Data.Point
 
 -- | Game state
 
@@ -20,10 +22,8 @@ data World = World {
     
 data Player = Player {
         --Player location
-        x               :: Float,
-        y               :: Float,
-        dx              :: Float,        
-        dy              :: Float,
+        playerLocation  :: Point,
+        playerSpeed     :: Vector,
         direction       :: Float
     }
     
@@ -42,5 +42,9 @@ data ShootAction    = Shoot      | DontShoot
 initial :: Int -> World
 initial seed = World (mkStdGen seed) NoRotation NoMovement DontShoot player emptyList
     where 
+<<<<<<< HEAD
     player = Player {x = 100, y = 100, dx = 0, dy = 0, direction = 0}
     emptyList = []
+=======
+    player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
+>>>>>>> origin/master
