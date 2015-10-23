@@ -81,6 +81,7 @@ createThrustParticles (World{player, movementAction, rndGen}) = if movementActio
     
 --------------Player end -----------------------------------    
 
+--Is dit niet eerder een shootBullet functie?
 updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
 updateBullets Shoot (Player {..}) bs = let b = Bullet x y direction in b:bs
     where (x,y)    = playerLocation
