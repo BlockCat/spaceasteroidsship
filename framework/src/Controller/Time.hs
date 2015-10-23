@@ -26,10 +26,12 @@ maxSpeed = 19
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = thrustParticles ++ updateParticles time particles, rndGen = r1}
+timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = newParticles, rndGen = r1, bullets = newBullets}
     where
-        updatedPlayer         = updatePlayer world
+        updatedPlayer         = updatePlayer world        
         (thrustParticles, r1) = createThrustParticles world
+        newParticles          = thrustParticles ++ updateParticles time particles
+        newBullets            = updateBullets shootAction player bullets
         
       
 --------------Player stuff -----------------------------------      
@@ -79,3 +81,7 @@ createThrustParticles (World{player, movementAction, rndGen}) = if movementActio
     
 --------------Player end -----------------------------------    
 
+updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
+updateBullets Shoot (Player {..}) bs = let b = Bullet x y direction in b:bs
+    where (x,y)    = playerLocation
+updateBullets _ _ bs = bs

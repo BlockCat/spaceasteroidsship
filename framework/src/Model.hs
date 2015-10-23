@@ -21,8 +21,11 @@ data World = World {
         -- TODO: add more fields here!
         player          :: Player,
         starField       :: [Star],
-        particles       :: [Particle]
+        particles       :: [Particle],
+        bullets          :: [Bullet]
+
     }
+    
 data Player = Player {
         --Player location
         playerLocation  :: Point,
@@ -31,12 +34,18 @@ data Player = Player {
     }
 
     
+data Bullet = Bullet {
+        bulletX         :: Float,
+        bulletY         :: Float,
+        bulletDir       :: Float
+    }
+    
 data RotateAction   = NoRotation | RotateLeft | RotateRight
 data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
 initial :: Int -> World
-initial seed = World rndGen NoRotation NoMovement DontShoot player stars []
+initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] []
     where         
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 1000 
