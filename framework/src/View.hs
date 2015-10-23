@@ -9,18 +9,23 @@ import Graphics.Gloss
 
 import Model
 import Stars
+import Particles
 
 -- | Drawing
 
 draw :: Float -> Float -> World -> Picture
-draw horizontalResolution verticalResolution world@(World{player, ..})
-    = Pictures [drawStars starField player, (drawPlayer player)]
+draw horizontalResolution verticalResolution world@(World{..})
+    = Pictures [stars', particles', player']
+    where
+        stars'     = drawStars     player starField 
+        particles' = drawParticles particles
+        player'    = drawPlayer    player
     
-drawStars :: [Star] -> Player -> Picture
-drawStars xs player = Pictures [drawStar x player | x <- xs]
+drawStars :: Player -> [Star] -> Picture
+drawStars player xs = Pictures $ map (drawStar player) xs
 
-drawStar :: Star -> Player -> Picture
-drawStar (Star{location, depth}) (Player{playerLocation}) = translate nx ny picture
+drawStar :: Player -> Star -> Picture
+drawStar (Player{playerLocation}) (Star{location, depth}) = translate nx ny picture
     where
     px = fst playerLocation
     py = snd playerLocation
@@ -56,3 +61,9 @@ drawPlayer player@(Player {playerLocation, direction}) = translate x y $ scale 0
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture
 drawRectangle x y width = (translate x y) . rectangleSolid width
+
+
+---------------------Particle start -----------------
+
+    
+-----------------------------------------------------
