@@ -60,7 +60,6 @@ wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (
                           | otherwise = x
 
 updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
-updateBullets Shoot player@(Player {..}) bs = let b = Bullet x y dx dy in b:bs
+updateBullets Shoot (Player {..}) bs = let b = Bullet x y direction in b:bs
     where (x,y)    = playerLocation
-          (dx, dy) = playerSpeed
 updateBullets _ _ bs = bs

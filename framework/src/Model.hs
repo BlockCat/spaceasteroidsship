@@ -32,8 +32,7 @@ data Player = Player {
 data Bullet = Bullet {
         bulletX         :: Float,
         bulletY         :: Float,
-        xDirection      :: Float,        
-        yDirection      :: Float     
+        bulletDir       :: Float
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
