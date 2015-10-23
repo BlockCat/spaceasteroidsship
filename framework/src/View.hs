@@ -59,4 +59,5 @@ drawRectangle x y width = translate x y . rectangleSolid width
 
 drawShoot :: Bullet -> Picture
 drawShoot Bullet{..} =  pictures [drawBullet 24 13, drawBullet (-24) 13]
-    where drawBullet x y = (color yellow . translate (bulletX) (bulletY) . rotate (90-bulletDir :: Float) . translate x y . circleSolid) 2
+    where drawBullet i j = (color yellow . translate x y . rotate (90-bulletDir :: Float) . translate i j . circleSolid) 2
+          (x, y)         = bulletLocation

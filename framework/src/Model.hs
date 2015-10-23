@@ -30,8 +30,8 @@ data Player = Player {
     }
     
 data Bullet = Bullet {
-        bulletX         :: Float,
-        bulletY         :: Float,
+        bulletLocation  :: Point,
+        bulletSpeed     :: Vector,
         bulletDir       :: Float
     }
     

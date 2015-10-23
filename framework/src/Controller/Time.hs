@@ -12,7 +12,7 @@ import Graphics.Gloss.Data.Point
 import Data.List
 
 import Graphics.Gloss
---import Graphics.Gloss.Geometry
+import Graphics.Gloss.Geometry.Angle
 
 import System.Random
 
@@ -20,13 +20,14 @@ import Model
 
 
 rotationSpeed = 6
-maxSpeed = 19
+maxSpeed      = 19
+bulletSpeedConstant = 5
 -- | Time handling
 
 timeHandler :: Float -> World -> World
 timeHandler time world@(World {..}) = do 
         let updatedPlayer = updatePlayer world
-        let newBullets = updateBullets shootAction player bullets
+        let newBullets = updateBullets shootAction player $ map moveBullet bullets
         world {player = updatedPlayer, bullets = newBullets}
         
 updatePlayer :: World -> Player
@@ -60,6 +61,12 @@ wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (
                           | otherwise = x
 
 updateBullets :: ShootAction -> Player -> [Bullet] -> [Bullet]
-updateBullets Shoot (Player {..}) bs = let b = Bullet x y direction in b:bs
-    where (x,y)    = playerLocation
+updateBullets Shoot (Player {..}) bs = let b = Bullet playerLocation playerSpeed direction in b:bs
 updateBullets _ _ bs = bs
+
+moveBullet :: Bullet -> Bullet
+moveBullet Bullet{..} = Bullet{bulletLocation = location, ..}
+    where location = (x + speedX + bulletSpeedConstant * (cos dir), y + speedY + bulletSpeedConstant * (sin dir))
+          (x,y)            = bulletLocation
+          (speedX, speedY) = bulletSpeed
+          dir              = degToRad bulletDir
