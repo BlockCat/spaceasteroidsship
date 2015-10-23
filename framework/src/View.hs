@@ -8,15 +8,30 @@ import Graphics.Gloss
 --import Graphics.Gloss.Geometry
 
 import Model
+import Stars
 
 -- | Drawing
 
 draw :: Float -> Float -> World -> Picture
-draw horizontalResolution verticalResolution world@(World{player, bullets, ..})
-    = Pictures $ [drawPlayer player] ++ map drawShoot bullets
+draw horizontalResolution verticalResolution world@(World{..})
+    = Pictures $ [drawStars starField player, (drawPlayer player)] ++ map drawShoot bullets
     
+drawStars :: [Star] -> Player -> Picture
+drawStars xs player = Pictures [drawStar x player | x <- xs]
+
+drawStar :: Star -> Player -> Picture
+drawStar (Star{location, depth}) (Player{playerLocation}) = translate nx ny picture
+    where
+    px = fst playerLocation
+    py = snd playerLocation
+    sx = fst location
+    sy = snd location
+    nx = sx - px/(depth*depth)
+    ny = sy - py/(depth*depth)
+    picture = color white (circle 1)
+
 drawPlayer :: Player -> Picture
-drawPlayer player@(Player {playerLocation, direction}) = (translate (fst playerLocation) (snd playerLocation) . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 
+drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 
                   color red lowerShootTriangleL, color red shootRectR, color red shootRectL, color red upperShootTriangleR, color red upperShootTriangleL, color grey lowerShootTriangleR2, color grey lowerShootTriangleL2, color grey upperShootTriangleR2, color grey upperShootTriangleL2]
     where 
     fillTriangleR        = rotate (90-direction :: Float)  $ polygon       [(35, -20), (40, -20), (35, -10)]
@@ -34,7 +49,9 @@ drawPlayer player@(Player {playerLocation, direction}) = (translate (fst playerL
     upperShootTriangleR2 = rotate (90-direction :: Float)  $ polygon       [(37, -3), (43, -3), (40, 15)]
     upperShootTriangleL2 = rotate (90-direction :: Float)  $ polygon       [(-43, -3), (-37, -3), (-40, 15)]
     
-    grey                 = greyN 0.4
+    grey                 = greyN (0.4)
+    x                    = fst playerLocation
+    y                    = snd playerLocation
     
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture
