@@ -8,6 +8,7 @@ import Graphics.Gloss.Data.Point
 import Graphics.Gloss
 import Stars
 import Particles
+import Bullets
 
 -- | Game state
 
@@ -34,12 +35,6 @@ data Player = Player {
     }
 
     
-data Bullet = Bullet {
-        bulletX         :: Float,
-        bulletY         :: Float,
-        bulletDir       :: Float
-    }
-    
 data RotateAction   = NoRotation | RotateLeft | RotateRight
 data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
@@ -48,6 +43,6 @@ initial :: Int -> World
 initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] []
     where         
     r1 = mkStdGen seed
-    (stars, rndGen) = generateStarField r1 1000 
+    (stars, rndGen) = generateStarField r1 3000 
     player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
     

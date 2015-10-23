@@ -20,7 +20,7 @@ createParticle :: Point -> Vector -> Float -> Picture -> Particle
 createParticle loc spd life pict = Particle loc spd life pict
             
 randomizedParticle :: Float -> Float -> Float -> Particle -> StdGen -> (Particle, StdGen)
-randomizedParticle spdVar degVar lifeVar particle@(Particle {..}) rndGen = (particle{speed = newSpeed, lifetime = lifetime + lifeVariation}, r2)    
+randomizedParticle spdVar degVar lifeVar particle@(Particle {..}) rndGen = (particle{speed = newSpeed, lifetime = lifetime + lifeVariation}, r3)    
     where
     (speedVariation, r1) = randomR (negate spdVar,  spdVar)  rndGen
     (degreVariation, r2) = randomR (negate degVar,  degVar)  r1

@@ -20,6 +20,7 @@ import System.Random
 import Model
 import RandomUtils
 import Particles
+import Bullets
 
 rotationSpeed = 6
 maxSpeed = 19
@@ -60,24 +61,24 @@ movePlayer player@(Player {playerSpeed, direction}) Thrust =
     
 
 wrapPlayer :: Player -> (Int, Int) -> Player
-wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (wrap (-450) 450 (fst playerLocation), wrap (-320) 320 (snd playerLocation))}
-    where wrap low high x | x < low  = high
-                          | x > high = low
+wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (wrap (-1000) 1000 (fst playerLocation), wrap (-1000) 1000 (snd playerLocation))}
+    where wrap low high x | x < low  = low
+                          | x > high = high
                           | otherwise = x
 
 
 createThrustParticles :: World -> ([Particle], StdGen)
 createThrustParticles (World{player, movementAction, rndGen}) = if movementAction == Thrust then randParticles else ([], rndGen)
     where 
-        speedVar    = 1.5
-        degreeVar   = 45
+        speedVar    = 1.0
+        degreeVar   = 180
         lifeTimeVar = 0.1
-        lifeTime    = 0.2
-        speed       = 0.5        
-        pict = color yellow $ circle 1        
+        lifeTime    = 0.015
+        speed       = 0.3
+        pict = color yellow $ circleSolid 2
         
         particle = createParticle (playerLocation player) ((playerSpeed player) * (negate speed, negate speed)) lifeTime $ pict
-        randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 300
+        randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 30
     
 --------------Player end -----------------------------------    
 

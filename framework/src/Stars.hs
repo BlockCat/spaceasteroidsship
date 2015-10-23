@@ -20,9 +20,9 @@ data Star = Star {
 createStar :: StdGen -> (Star, StdGen)
 createStar rndGen = (Star (x, y) z, r3)
     where
-        (x, r1) = randomR (-400, 400) rndGen
-        (y, r2) = randomR (-400, 400) r1
-        (z, r3) = randomR (5, 16) r2
+        (x, r1) = randomR (-2000, 2000) rndGen
+        (y, r2) = randomR (-2000, 2000) r1
+        (z, r3) = randomR (1, 4) r2
         
             
 generateStarField :: StdGen -> Int -> ([Star], StdGen)
