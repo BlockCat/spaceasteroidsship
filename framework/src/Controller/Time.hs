@@ -23,7 +23,7 @@ import Particles
 import Bullets
 
 rotationSpeed = 6
-maxSpeed = 19
+maxSpeed = 10
 -- | Time handling
 
 timeHandler :: Float -> World -> World
