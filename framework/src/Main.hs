@@ -22,9 +22,9 @@ import Controller
 
 main :: IO ()
 main = do
-    args <- getArgs
-    time <- round <$> getPOSIXTime
-    let initial'        = initial time
+    args     <- getArgs
+    time     <- round <$> getPOSIXTime
+    initial' <- initial time
     let (w, h, display) = chooseDisplay args
     let background      = black
     let fps             = 60
