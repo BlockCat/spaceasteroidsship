@@ -30,7 +30,8 @@ spawnDistance = 30000
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = newParticles, rndGen = r1, bullets = newBullets, enemies = newEnemies}
+timeHandler time world@(World {..}) | isHit player enemies    = error "getBetter"
+                                    | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = r1, bullets = newBullets, enemies = newEnemies}
     where
         updatedPlayer         = updatePlayer world        
         (thrustParticles, r1) = createThrustParticles world
@@ -40,10 +41,20 @@ timeHandler time world@(World {..}) = world {player = updatedPlayer, particles =
                               | otherwise                         = enemies
 --------------Player stuff -----------------------------------      
 updatePlayer :: World -> Player
-updatePlayer world@(World{..}) = let p1 = rotatePlayer player rotateAction
-                                     p2 = movePlayer p1 movementAction
-                                     p3 = wrapPlayer p2 (800, 640)
-                                 in  p3 {playerLocation = playerLocation p3 + playerSpeed p3}
+updatePlayer World{..} = let p1 = rotatePlayer player rotateAction
+                             p2 = movePlayer p1 movementAction
+                             p3 = wrapPlayer p2 (800, 640)
+                         in  p3 {playerLocation = playerLocation p3 + playerSpeed p3}
+                         
+isHit :: Player -> [Enemy] -> Bool
+isHit player enemies = or $ map (hitCheck player) enemies
+                         
+hitCheck :: Player -> Enemy -> Bool
+hitCheck Player{..} Enemy{..} | ((ex - x)^2 + (ey - y)^2) < 4000 = True
+                              | otherwise                         = False
+        where (ex, ey) = enemyLocation
+              (x,y)    = playerLocation
+
 
         
 rotatePlayer :: Player -> RotateAction -> Player
