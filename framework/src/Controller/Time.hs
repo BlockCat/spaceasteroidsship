@@ -27,6 +27,7 @@ import Enemies
 rotationSpeed = 6
 maxSpeed = 10
 spawnDistance = 30000
+hitBox = 550
 -- | Time handling
 
 timeHandler :: Float -> World -> World
@@ -36,7 +37,7 @@ timeHandler time world@(World {..}) | isHit player enemies    = error "getBetter
         updatedPlayer         = updatePlayer world        
         (thrustParticles, r1) = createThrustParticles world
         newParticles          = thrustParticles ++ updateParticles time particles
-        newBullets            = shootBullet shootAction player bullets
+        newBullets            = shootBullet shootAction player (filterOutOfRange bullets)
         newEnemies            | shouldSpawn (head enemies) player = spawnEnemies player : enemies
                               | otherwise                         = enemies
 --------------Player stuff -----------------------------------      
@@ -50,8 +51,8 @@ isHit :: Player -> [Enemy] -> Bool
 isHit player enemies = or $ map (hitCheck player) enemies
                          
 hitCheck :: Player -> Enemy -> Bool
-hitCheck Player{..} Enemy{..} | ((ex - x)^2 + (ey - y)^2) < 4000 = True
-                              | otherwise                         = False
+hitCheck Player{..} Enemy{..} | ((ex - x)^2 + (ey - y)^2) < hitBox = True
+                              | otherwise                          = False
         where (ex, ey) = enemyLocation
               (x,y)    = playerLocation
 

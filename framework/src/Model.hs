@@ -40,5 +40,5 @@ initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] [] [
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 3000 
     player = Player (100, 100) (0, 0) 0
-    enemy  = Enemy (50, 150) (0,0) 0
+    enemy  = Enemy  (50, 150)  (0,0)  0
     

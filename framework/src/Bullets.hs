@@ -30,3 +30,11 @@ moveBullet Bullet{..} = Bullet{bulletLocation = location, ..}
           (x,y)            = bulletLocation
           (speedX, speedY) = bulletSpeed
           dir              = degToRad bulletDir
+
+bulletOutOfWindow :: Bullet -> Bool
+bulletOutOfWindow Bullet{..} | (x > 1500 || x < (-1500) || y < (-1500) || y > 1500) = True
+                             | otherwise                                            = False
+    where (x, y) = bulletLocation
+    
+filterOutOfRange :: [Bullet] -> [Bullet]
+filterOutOfRange bs = filter (not . bulletOutOfWindow) bs
