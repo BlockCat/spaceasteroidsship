@@ -56,10 +56,10 @@ isHit :: Player -> [Enemy] -> Bool
 isHit player enemies = or $ map (hitCheck player) enemies
                          
 hitCheck :: Player -> Enemy -> Bool
-hitCheck Player{..} Enemy{..} | magV (enemyLocation - playerLocation) < 15 = True
-                              | otherwise                         = False
-        where (ex, ey) = enemyLocation
-              (x,y)    = playerLocation
+hitCheck Player{..} Enemy{..} | distance < 15 = True
+                              | otherwise     = False
+    where 
+        distance = magV (enemyLocation - playerLocation)
 
         
 rotatePlayer :: Player -> RotateAction -> Player
