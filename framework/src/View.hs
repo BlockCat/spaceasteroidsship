@@ -22,7 +22,8 @@ verticalResolution = 600.0
 
 draw :: Float -> Float -> World -> Picture
 draw horizontalResolution' verticalResolution' world@(World{..})
-    = translate cameraOffsetX cameraOffsetY $ scale scaledX scaledY $ Pictures [stars', boundary', particles', player', bullets', viewPort, enemies']
+    = translate cameraOffsetX cameraOffsetY $ Pictures [stars', boundary', particles', player', enemies', bullets', viewPort]
+
     where
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
@@ -32,9 +33,7 @@ draw horizontalResolution' verticalResolution' world@(World{..})
         viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player
-        cameraOffsetY = (negate . snd . playerLocation) player
-        scaledX       = horizontalResolution / horizontalResolution'
-        scaledY       = verticalResolution   / verticalResolution'
+        cameraOffsetY = (negate . snd . playerLocation) player        
     
 drawStars :: Player -> [Star] -> Picture
 drawStars player xs = Pictures $ map (drawStar player) xs
@@ -49,7 +48,7 @@ drawStar (Player{playerLocation}) (Star{location, depth}) = if shouldDraw then t
     nx = sx - px/(depth*depth)
     ny = sy - py/(depth*depth)
     
-    picture = color white (circleSolid (5 - depth))
+    picture = color white (circleSolid (4 - depth))
     (cameraOffsetX , cameraOffsetY) = playerLocation
     width         = 600
     height        = 300

@@ -7,6 +7,8 @@ import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Point 
 import Graphics.Gloss
 
+import RandomUtils
+
     
 data Particle = Particle {
         -- Event queue
@@ -28,11 +30,19 @@ randomizedParticle spdVar degVar lifeVar particle@(Particle {..}) rndGen = (part
     newSpeed             = rotateV (degreVariation * pi / 180) (speed + (speedVariation, 0))
     
     
+explosion :: Point -> StdGen -> ([Particle], StdGen)
+explosion loc rndGen = (outerExplosion ++ innerExplosion, r2)
+    where
+        speedVar                   = 5
+        particleCreator speed pict = randomizedParticle speedVar 180 5 (createParticle loc (speed, 0) 10 pict)
+        (innerExplosion, r1)       = generateRandom rndGen (particleCreator 20 $ color yellow $ circleSolid 1) 1000
+        (outerExplosion, r2)       = generateRandom r1 (particleCreator 40 $ color red    $ circleSolid 1) 1000
+    
 updateParticles :: Float -> [Particle] -> [Particle]
 updateParticles elapsed xs = filter (\particle -> lifetime particle > 0) (map (updateParticle elapsed) xs) 
 
 updateParticle  :: Float -> Particle -> Particle
-updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, location = location + speed}
+updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, location = location + (mulSV elapsed speed)}
 
 drawParticles :: [Particle] -> Picture
 drawParticles xs = Pictures $ map drawParticle xs
