@@ -32,7 +32,7 @@ updateParticles :: Float -> [Particle] -> [Particle]
 updateParticles elapsed xs = filter (\particle -> lifetime particle > 0) (map (updateParticle elapsed) xs) 
 
 updateParticle  :: Float -> Particle -> Particle
-updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, location = location + speed}
+updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, location = location + (mulSV elapsed speed)}
 
 drawParticles :: [Particle] -> Picture
 drawParticles xs = Pictures $ map drawParticle xs
