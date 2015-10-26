@@ -11,6 +11,7 @@ import Player
 import Stars
 import Particles
 import Bullets
+import Enemies
 
 -- | Game state
 
@@ -25,8 +26,8 @@ data World = World {
         player           :: Player,
         starField        :: [Star],
         particles        :: [Particle],
-        bullets          :: [Bullet]
-
+        bullets          :: [Bullet],
+        enemies          :: [Enemy]
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
@@ -34,9 +35,10 @@ data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
 initial :: Int -> World
-initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] []
+initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] [] [enemy]
     where         
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 3000 
-    player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
+    player = Player (100, 100) (0, 0) 0
+    enemy  = Enemy (50, 150) (0,0) 0
     

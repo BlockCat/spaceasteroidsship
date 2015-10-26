@@ -12,6 +12,7 @@ import Player
 import Stars
 import Particles
 import Bullets
+import Enemies
 
 -- | Drawing
 
@@ -21,12 +22,13 @@ verticalResolution = 600.0
 
 draw :: Float -> Float -> World -> Picture
 draw horizontalResolution' verticalResolution' world@(World{..})
-    = translate cameraOffsetX cameraOffsetY $ scale scaledX scaledY $ Pictures [stars', boundary', particles', player', bullets', viewPort]
+    = translate cameraOffsetX cameraOffsetY $ scale scaledX scaledY $ Pictures [stars', boundary', particles', player', bullets', viewPort, enemies']
     where
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
         player'       = drawPlayer    player
         bullets'      = drawBullets   bullets
+        enemies'      = drawEnemies   enemies
         viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player

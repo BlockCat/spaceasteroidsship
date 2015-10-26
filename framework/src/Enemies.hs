@@ -10,6 +10,9 @@ data Enemy = Enemy {
         enemyDirection :: Float
     }
 
+drawEnemies :: [Enemy] -> Picture
+drawEnemies xs = Pictures $ map drawEnemy xs     
+    
 drawEnemy :: Enemy -> Picture
 drawEnemy Enemy{..}    = translate x y (color red triangle)
         where triangle = rotate (90-enemyDirection :: Float)  $ polygon [(-5, -5), (5, -5), (0, 5)]

@@ -22,19 +22,22 @@ import Player
 import RandomUtils
 import Particles
 import Bullets
+import Enemies
 
 rotationSpeed = 6
 maxSpeed = 10
+spawnDistance = 30000
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = newParticles, rndGen = r1, bullets = newBullets}
+timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = newParticles, rndGen = r1, bullets = newBullets, enemies = newEnemies}
     where
         updatedPlayer         = updatePlayer world        
         (thrustParticles, r1) = createThrustParticles world
         newParticles          = thrustParticles ++ updateParticles time particles
         newBullets            = shootBullet shootAction player bullets
-      
+        newEnemies            | shouldSpawn (head enemies) player = spawnEnemies player : enemies
+                              | otherwise                         = enemies
 --------------Player stuff -----------------------------------      
 updatePlayer :: World -> Player
 updatePlayer world@(World{..}) = 
@@ -61,10 +64,11 @@ movePlayer player@(Player {playerSpeed, direction}) Thrust =
     
 
 wrapPlayer :: Player -> (Int, Int) -> Player
-wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = wrap (-1000) 1000 (fst playerLocation), wrap (-1000) 1000 (snd playerLocation)}
-    where wrap low high x | x < low  = low
-                          | x > high = high
-                          | otherwise = x      
+wrapPlayer player@(Player {playerLocation}) (w, h) = player {playerLocation = (wrap (-1000) 1000 x, wrap (-1000) 1000 y)}
+    where (x, y)          = playerLocation
+          wrap low high a | a < low   = low
+                          | a > high  = high
+                          | otherwise = a      
 
 shootBullet :: ShootAction -> Player -> [Bullet] -> [Bullet]
 shootBullet Shoot (Player {..}) bs = let b = Bullet playerLocation playerSpeed direction in b: map moveBullet bs
@@ -85,3 +89,13 @@ createThrustParticles (World{player, movementAction, rndGen}) = if movementActio
         randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 30
     
 --------------Player end -----------------------------------   
+
+shouldSpawn :: Enemy -> Player -> Bool
+shouldSpawn Enemy{..} Player{..} | ((ex - x)^2 + (ey - y)^2) > spawnDistance = True
+                                 | otherwise                                 = False
+                  where (ex, ey) = enemyLocation
+                        (x,y)    = playerLocation
+
+spawnEnemies :: Player -> Enemy
+spawnEnemies Player{..} = Enemy (x-50, y+50) (0,0) 0 
+    where (x, y) = playerLocation
