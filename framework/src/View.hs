@@ -6,9 +6,9 @@ module View (
 
 import Graphics.Gloss
 import Graphics.Gloss.Data.Point
---import Graphics.Gloss.Geometry
 
 import Model
+import Player
 import Stars
 import Particles
 import Bullets
@@ -48,8 +48,7 @@ drawStar (Player{playerLocation}) (Star{location, depth}) = if shouldDraw then t
     ny = sy - py/(depth*depth)
     
     picture = color white (circleSolid (5 - depth))
-    cameraOffsetX = (fst playerLocation)
-    cameraOffsetY = (snd playerLocation)
+    (cameraOffsetX , cameraOffsetY) = playerLocation
     width         = 600
     height        = 300
     p1            = (cameraOffsetX - width, cameraOffsetY - height)
@@ -76,9 +75,8 @@ drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 
     upperShootTriangleR2 = rotate (90-direction :: Float)  $ polygon       [(37, -3), (43, -3), (40, 15)]
     upperShootTriangleL2 = rotate (90-direction :: Float)  $ polygon       [(-43, -3), (-37, -3), (-40, 15)]
     
-    grey                 = greyN (0.4)
-    x                    = fst playerLocation
-    y                    = snd playerLocation
+    grey                 = greyN 0.4
+    (x, y)               = playerLocation
     
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture

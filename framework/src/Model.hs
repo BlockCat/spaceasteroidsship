@@ -6,6 +6,8 @@ import System.Random
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Point
 import Graphics.Gloss
+
+import Player
 import Stars
 import Particles
 import Bullets
@@ -20,18 +22,11 @@ data World = World {
         movementAction   :: MovementAction,
         shootAction      :: ShootAction,
         -- TODO: add more fields here!
-        player          :: Player,
-        starField       :: [Star],
-        particles       :: [Particle],
+        player           :: Player,
+        starField        :: [Star],
+        particles        :: [Particle],
         bullets          :: [Bullet]
 
-    }
-    
-data Player = Player {
-        --Player location
-        playerLocation  :: Point,
-        playerSpeed     :: Vector,
-        direction       :: Float
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
