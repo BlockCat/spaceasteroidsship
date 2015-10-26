@@ -5,7 +5,10 @@ module Model where
 import System.Random
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Point
+import Graphics.Gloss
 import Stars
+import Particles
+import Bullets
 
 -- | Game state
 
@@ -17,9 +20,11 @@ data World = World {
         movementAction   :: MovementAction,
         shootAction      :: ShootAction,
         -- TODO: add more fields here!
-        player           :: Player,
-        bullets          :: [Bullet],
-        starField        :: [Star]
+        player          :: Player,
+        starField       :: [Star],
+        particles       :: [Particle],
+        bullets          :: [Bullet]
+
     }
     
 data Player = Player {
@@ -29,21 +34,14 @@ data Player = Player {
         direction       :: Float
     }
     
-data Bullet = Bullet {
-        bulletLocation  :: Point,
-        bulletSpeed     :: Vector,
-        bulletDir       :: Float
-    }
-    
 data RotateAction   = NoRotation | RotateLeft | RotateRight
-data MovementAction = NoMovement | Thrust
+data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
-initial :: Int -> IO World
-initial seed =
-    do
-    stars <- generateStarField rndGen 1000
-    return $ World rndGen NoRotation NoMovement DontShoot player [] stars
-    where     
+initial :: Int -> World
+initial seed = World rndGen NoRotation NoMovement DontShoot player stars [] []
+    where         
+    r1 = mkStdGen seed
+    (stars, rndGen) = generateStarField r1 3000 
     player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
-    rndGen = mkStdGen seed
+    

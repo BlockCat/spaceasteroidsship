@@ -24,7 +24,7 @@ main :: IO ()
 main = do
     args     <- getArgs
     time     <- round <$> getPOSIXTime
-    initial' <- initial time
+    let initial'        = initial time
     let (w, h, display) = chooseDisplay args
     let background      = black
     let fps             = 60

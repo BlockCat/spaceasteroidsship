@@ -5,22 +5,40 @@ module View (
 ) where
 
 import Graphics.Gloss
+import Graphics.Gloss.Data.Point
 --import Graphics.Gloss.Geometry
 
 import Model
 import Stars
+import Particles
+import Bullets
 
 -- | Drawing
 
-draw :: Float -> Float -> World -> Picture
-draw horizontalResolution verticalResolution world@(World{..})
-    = Pictures $ [drawStars starField player, (drawPlayer player)] ++ map drawShoot bullets
-    
-drawStars :: [Star] -> Player -> Picture
-drawStars xs player = Pictures [drawStar x player | x <- xs]
+horizontalResolution = 1200.0
+verticalResolution = 600.0
 
-drawStar :: Star -> Player -> Picture
-drawStar (Star{location, depth}) (Player{playerLocation}) = translate nx ny picture
+
+draw :: Float -> Float -> World -> Picture
+draw horizontalResolution' verticalResolution' world@(World{..})
+    = translate cameraOffsetX cameraOffsetY $ scale scaledX scaledY $ Pictures [stars', boundary', particles', player', bullets', viewPort]
+    where
+        stars'        = drawStars     player starField 
+        particles'    = drawParticles particles
+        player'       = drawPlayer    player
+        bullets'      = drawBullets   bullets
+        viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
+        boundary'     = color blue $ rectangleWire 2000 2000
+        cameraOffsetX = (negate . fst . playerLocation) player
+        cameraOffsetY = (negate . snd . playerLocation) player
+        scaledX       = horizontalResolution / horizontalResolution'
+        scaledY       = verticalResolution   / verticalResolution'
+    
+drawStars :: Player -> [Star] -> Picture
+drawStars player xs = Pictures $ map (drawStar player) xs
+
+drawStar :: Player -> Star -> Picture
+drawStar (Player{playerLocation}) (Star{location, depth}) = if shouldDraw then translate nx ny picture else blank
     where
     px = fst playerLocation
     py = snd playerLocation
@@ -28,7 +46,16 @@ drawStar (Star{location, depth}) (Player{playerLocation}) = translate nx ny pict
     sy = snd location
     nx = sx - px/(depth*depth)
     ny = sy - py/(depth*depth)
-    picture = color white (circle 1)
+    
+    picture = color white (circleSolid (5 - depth))
+    cameraOffsetX = (fst playerLocation)
+    cameraOffsetY = (snd playerLocation)
+    width         = 600
+    height        = 300
+    p1            = (cameraOffsetX - width, cameraOffsetY - height)
+    p2            = (cameraOffsetX + width, cameraOffsetY + height)
+    shouldDraw    = pointInBox (nx, ny) p1 p2
+    
 
 drawPlayer :: Player -> Picture
 drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 
@@ -56,8 +83,3 @@ drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture
 drawRectangle x y width = translate x y . rectangleSolid width
-
-drawShoot :: Bullet -> Picture
-drawShoot Bullet{..} =  pictures [drawBullet 24 13, drawBullet (-24) 13]
-    where drawBullet i j = (color yellow . translate x y . rotate (90-bulletDir :: Float) . translate i j . circleSolid) 2
-          (x, y)         = bulletLocation

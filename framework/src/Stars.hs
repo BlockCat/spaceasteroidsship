@@ -7,6 +7,8 @@ import Control.Monad        (replicateM)
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Data.Point
 
+import RandomUtils
+
 -- | Game state
 
 data Star = Star {
@@ -15,14 +17,13 @@ data Star = Star {
         depth           :: Float
     }
  
-createStar :: StdGen -> IO Star
-createStar rndGen = 
-    do
-        x <- getStdRandom $ randomR (-400, 400)
-        y <- getStdRandom $ randomR (-400, 400)
-        z <- getStdRandom $ randomR (5, 16)
-        return $ Star (x, y) z
-            
-generateStarField :: StdGen -> Int -> IO [Star]
-generateStarField rndGen n = replicateM n (createStar rndGen)
+createStar :: StdGen -> (Star, StdGen)
+createStar rndGen = (Star (x, y) z, r3)
+    where
+        (x, r1) = randomR (-2000, 2000) rndGen
+        (y, r2) = randomR (-2000, 2000) r1
+        (z, r3) = randomR (1, 4) r2
         
+            
+generateStarField :: StdGen -> Int -> ([Star], StdGen)
+generateStarField rndGen n = generateRandom rndGen createStar n
