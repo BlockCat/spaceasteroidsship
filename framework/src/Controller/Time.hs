@@ -40,12 +40,10 @@ timeHandler time world@(World {..}) = world {player = updatedPlayer, particles =
                               | otherwise                         = enemies
 --------------Player stuff -----------------------------------      
 updatePlayer :: World -> Player
-updatePlayer world@(World{..}) = 
-    do
-    let p1 = rotatePlayer player rotateAction
-    let p2 = movePlayer p1 movementAction
-    let p3 = wrapPlayer p2 (800, 640)
-    p3 {playerLocation = playerLocation p3 + playerSpeed p3}
+updatePlayer world@(World{..}) = let p1 = rotatePlayer player rotateAction
+                                     p2 = movePlayer p1 movementAction
+                                     p3 = wrapPlayer p2 (800, 640)
+                                 in  p3 {playerLocation = playerLocation p3 + playerSpeed p3}
 
         
 rotatePlayer :: Player -> RotateAction -> Player
@@ -56,11 +54,10 @@ rotatePlayer player RotateRight = player {direction = direction player - rotatio
 movePlayer :: Player -> MovementAction -> Player
 movePlayer player@(Player {playerSpeed, direction}) NoMovement = player {playerSpeed = playerSpeed * (0.96, 0.96)}
 movePlayer player@(Player {playerSpeed, direction}) Thrust =
-    do 
         let sp1 = playerSpeed * (0.97, 0.97) + rotateV (direction * pi / 180) (0.6, 0)        
-        let maxSpeedReached = magV sp1 >= maxSpeed
-        let newSpeed = if maxSpeedReached then rotateV (direction * pi / 180) (maxSpeed, 0) else sp1
-        player {playerSpeed = newSpeed}
+            maxSpeedReached = magV sp1 >= maxSpeed
+            newSpeed = if maxSpeedReached then rotateV (direction * pi / 180) (maxSpeed, 0) else sp1
+        in  player {playerSpeed = newSpeed}
     
 
 wrapPlayer :: Player -> (Int, Int) -> Player
@@ -71,7 +68,7 @@ wrapPlayer player@(Player {playerLocation}) (w, h) = player {playerLocation = (w
                           | otherwise = a      
 
 shootBullet :: ShootAction -> Player -> [Bullet] -> [Bullet]
-shootBullet Shoot (Player {..}) bs = let b = Bullet playerLocation playerSpeed direction in b: map moveBullet bs
+shootBullet Shoot (Player {..}) bs = let b = Bullet playerLocation playerSpeed direction in b : map moveBullet bs
 shootBullet _ _ bs = map moveBullet bs
 
 
