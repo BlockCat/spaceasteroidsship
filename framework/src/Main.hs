@@ -25,9 +25,9 @@ main = do
     args     <- getArgs
     time     <- round <$> getPOSIXTime
     let initial'        = initial time
-    let (w, h, display) = chooseDisplay args
-    let background      = black
-    let fps             = 60
+        (w, h, display) = chooseDisplay args
+        background      = black
+        fps             = 60
     play display background fps initial' (draw w h) eventHandler timeHandler
 
 -- | Choose a display mode. Note that the resolution of a full screen mode
@@ -40,6 +40,7 @@ chooseDisplay []
                  ,round defaultVerticalResolution  )
                  (100,100)
       )
+      
 chooseDisplay [read -> horizontal, read -> vertical]
     = ( fromIntegral horizontal, fromIntegral vertical
       , FullScreen (horizontal, vertical)

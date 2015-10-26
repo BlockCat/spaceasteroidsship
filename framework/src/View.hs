@@ -23,6 +23,7 @@ verticalResolution = 600.0
 draw :: Float -> Float -> World -> Picture
 draw horizontalResolution' verticalResolution' world@(World{..})
     = translate cameraOffsetX cameraOffsetY $ Pictures [stars', boundary', particles', player', enemies', bullets', viewPort]
+
     where
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles

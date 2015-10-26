@@ -48,8 +48,8 @@ initial seed = World {
                         enemies        = [],
                         enemyTimer     = 4
                      }
+
     where         
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 3000 
-    player = Player {playerLocation = (100, 100), playerSpeed = (0, 0), direction = 0}
-    
+    player = Player (100, 100) (0, 0) 0

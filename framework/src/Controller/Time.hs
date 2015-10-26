@@ -25,29 +25,41 @@ import Bullets
 import Enemies
 
 rotationSpeed = 6
+
 maxSpeed = 1000
 playerAcceleration = 15
 bulletVelocity = 1000
+spawnDistance = 500
+
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemyTimer = newEnemyTimer}
+timeHandler time world@(World {..}) | isHit player enemies    = error "getBetter"
+                                    | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemyTimer = newEnemyTimer}
     where
         updatedPlayer                       = updatePlayer time world        
         (thrustParticles, r1)               = createThrustParticles world
         newParticles                        = thrustParticles ++ updateParticles time particles
         newBullets                          = shootBullet time shootAction player bullets
         (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r1
-        newEnemies                          = updateEnemies time player enemies1
-      
+        newEnemies                          = updateEnemies time player enemies1        
+        
 --------------Player stuff -----------------------------------      
 updatePlayer :: Float -> World -> Player
-updatePlayer time world@(World{..}) = 
-    do
-    let p1 = rotatePlayer player rotateAction
-    let p2 = movePlayer p1 movementAction
-    let p3 = wrapPlayer p2 (800, 640)
-    p3 {playerLocation = playerLocation p3 + (mulSV time $ playerSpeed p3)}
+updatePlayer time World{..} = p3 {playerLocation = playerLocation p3 + (mulSV time $ playerSpeed p3)}
+    where
+        p1 = rotatePlayer player rotateAction
+        p2 = movePlayer p1 movementAction
+        p3 = wrapPlayer p2 (800, 640)        
+                         
+isHit :: Player -> [Enemy] -> Bool
+isHit player enemies = or $ map (hitCheck player) enemies
+                         
+hitCheck :: Player -> Enemy -> Bool
+hitCheck Player{..} Enemy{..} | magV (enemyLocation - playerLocation) < 15 = True
+                              | otherwise                         = False
+        where (ex, ey) = enemyLocation
+              (x,y)    = playerLocation
 
         
 rotatePlayer :: Player -> RotateAction -> Player
@@ -57,18 +69,18 @@ rotatePlayer player RotateRight = player {direction = direction player - rotatio
 
 movePlayer :: Player -> MovementAction -> Player
 movePlayer player@(Player {playerSpeed, direction}) NoMovement = player {playerSpeed = playerSpeed * (0.96, 0.96)}
-movePlayer player@(Player {playerSpeed, direction}) Thrust =
-    do 
-        let sp1 = playerSpeed * (0.97, 0.97) + rotateV (pi * direction / 180)(playerAcceleration, 0)        
-        let maxSpeedReached = magV sp1 >= maxSpeed
-        let newSpeed = if maxSpeedReached then setMagnitudeVS sp1 maxSpeed else sp1
-        player {playerSpeed = newSpeed}
-    
+movePlayer player@(Player {playerSpeed, direction}) Thrust = player {playerSpeed = newSpeed}
+    where 
+        sp1 = playerSpeed * (0.97, 0.97) + rotateV (pi * direction / 180)(playerAcceleration, 0)        
+        maxSpeedReached = magV sp1 >= maxSpeed
+        newSpeed = if maxSpeedReached then setMagnitudeVS sp1 maxSpeed else sp1
+   
 
 
 wrapPlayer :: Player -> (Int, Int) -> Player
-wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (wrap (-1000) 1000 (fst playerLocation), wrap (-1000) 1000 (snd playerLocation))}
-    where wrap low high x | x < low  = low
+wrapPlayer player@(Player {playerLocation}) (w, h) = player { playerLocation = (wrap (-1000) 1000 x, wrap (-1000) 1000 y)}
+    where (x, y)          = playerLocation    
+          wrap low high x | x < low  = low
                           | x > high = high
                           | otherwise = x      
 
@@ -92,17 +104,28 @@ createThrustParticles (World{player, movementAction, rndGen}) = if movementActio
         randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 30
     
 --------------Player end -----------------------------------   
+
 setMagnitudeVS :: Vector -> Float -> Vector
 setMagnitudeVS vector mag = mulSV mag $ normalizeV vector
 --------------Enemy  start----------------------------------
 spawnRandomEnemy :: Float -> World -> StdGen -> ([Enemy], Float, StdGen)
 spawnRandomEnemy ellapsed world@(World {..}) stdGen
-        | enemyTimer' > 0  = (enemies,            enemyTimer',  stdGen)
-        | otherwise        = (enemy:enemies, 2 + timeDiff, r2)
+        | enemyTimer' > 0  = (enemies ,  enemyTimer', stdGen)
+        | otherwise        = (enemies', 2 + timeDiff, r2)
     where
         enemyTimer'     = enemyTimer - ellapsed        
         (timeDiff, r1)  = randomR ((-0.75), 0.75) rndGen
-        (enemy,    r2) = spawnEnemyAtRandomLocation r1
+        (enemy,    r2)  = spawnEnemyAtRandomLocation r1
+        enemies'        = if shouldSpawn enemy player then enemy:enemies else enemies
         
 updateEnemies :: Float -> Player -> [Enemy] -> [Enemy]
 updateEnemies time player xs = map (\x -> (updateEnemy x) x player time) xs
+
+shouldSpawn :: Enemy -> Player -> Bool
+shouldSpawn Enemy{..} Player{..} | magV (enemyLocation - playerLocation) > spawnDistance = True
+                                 | otherwise                                 = False                  
+
+{-spawnEnemies :: Player -> Enemy
+spawnEnemies Player{..} = Enemy (x-50, y+50) (0,0) 0 
+    where (x, y) = playerLocation-}
+
