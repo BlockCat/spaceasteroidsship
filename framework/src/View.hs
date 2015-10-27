@@ -29,7 +29,7 @@ draw horizontalResolution' verticalResolution' world@(World{..})
         particles'    = drawParticles particles
         player'       = drawPlayer'    player
         bullets'      = drawBullets   bullets
-        enemies'      = drawEnemies   enemies
+        enemies'      = drawEnemies   enemies enemyImage
         viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player

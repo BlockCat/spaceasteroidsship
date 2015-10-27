@@ -35,7 +35,7 @@ spawnDistance = 500
 
 timeHandler :: Float -> World -> World
 timeHandler time world@(World {..}) | isHit player enemies    = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}--error "getBetter"
-                                    | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemyTimer = newEnemyTimer}
+                                    | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer}
     where
         updatedPlayer                       = updatePlayer time world        
         (thrustParticles, r1)               = createThrustParticles world
@@ -113,7 +113,7 @@ spawnRandomEnemy ellapsed world@(World {..}) stdGen
         | enemyTimer' > 0  = (enemies ,  enemyTimer', stdGen)
         | otherwise        = (enemies', 2 + timeDiff, r2)
     where
-        enemyTimer'     = enemyTimer - ellapsed        
+        enemyTimer'     = enemySpawnTimer - ellapsed        
         (timeDiff, r1)  = randomR ((-0.75), 0.75) rndGen
         (enemy,    r2)  = spawnEnemyAtRandomLocation r1
         enemies'        = if shouldSpawn enemy player then enemy:enemies else enemies

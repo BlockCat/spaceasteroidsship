@@ -28,15 +28,16 @@ data World = World {
         particles        :: [Particle],
         bullets          :: [Bullet],
         enemies          :: [Enemy],
-        enemyTimer       :: Float
+        enemySpawnTimer       :: Float,
+        enemyImage       :: Picture
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
 data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
-initial :: Int -> Picture -> World
-initial seed playerBmp = World {
+initial :: Int -> Picture -> Picture -> World
+initial seed playerBmp enemyBmp = World {
                         rndGen         = rndGen,
                         rotateAction   = NoRotation,
                         movementAction = NoMovement,
@@ -46,7 +47,8 @@ initial seed playerBmp = World {
                         particles      = [],
                         bullets        = [],
                         enemies        = [],
-                        enemyTimer     = 4
+                        enemySpawnTimer= 4,
+                        enemyImage     = enemyBmp
                      }
 
     where         
@@ -63,7 +65,7 @@ emptyWorld world@(World{..})=
                 player         = player',
                 bullets        = [],
                 enemies        = [],
-                enemyTimer     = 4
+                enemySpawnTimer     = 4
              }
     where
         player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}

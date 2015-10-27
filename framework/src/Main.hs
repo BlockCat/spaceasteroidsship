@@ -23,10 +23,11 @@ import Controller
 
 main :: IO ()
 main = do
-    args      <- getArgs
-    time      <- round <$> getPOSIXTime
+    args           <- getArgs
+    time           <- round <$> getPOSIXTime
     Just playerBmp <- loadJuicyPNG "testSpaceShip.png"
-    let initial'        = initial time playerBmp
+    Just enemyBmp  <- loadJuicyPNG "testEnemy.png"
+    let initial'        = initial time playerBmp enemyBmp
         (w, h, display) = chooseDisplay args
         background      = black
         fps             = 60
