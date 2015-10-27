@@ -12,6 +12,7 @@ import Data.Time.Clock.POSIX (getPOSIXTime)
 import System.Environment    (getArgs)
 
 import Graphics.Gloss                                              {- 1.8.2.1 -}
+import Graphics.Gloss.Juicy
 
 import Config
 import Model
@@ -22,9 +23,11 @@ import Controller
 
 main :: IO ()
 main = do
-    args     <- getArgs
-    time     <- round <$> getPOSIXTime
-    let initial'        = initial time
+    args           <- getArgs
+    time           <- round <$> getPOSIXTime
+    Just playerBmp <- loadJuicyPNG "testSpaceShip.png"
+    Just enemyBmp  <- loadJuicyPNG "testEnemy.png"
+    let initial'        = initial time playerBmp enemyBmp
         (w, h, display) = chooseDisplay args
         background      = black
         fps             = 60

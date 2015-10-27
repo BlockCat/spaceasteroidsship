@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, NamedFieldPuns #-}
+{-# LANGUAGE DisambiguateRecordFields, NamedFieldPuns, RecordWildCards #-}
 
 module Model where
 
@@ -28,15 +28,16 @@ data World = World {
         particles        :: [Particle],
         bullets          :: [Bullet],
         enemies          :: [Enemy],
-        enemyTimer       :: Float
+        enemySpawnTimer       :: Float,
+        enemyImage       :: Picture
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
 data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
-initial :: Int -> World
-initial seed = World {
+initial :: Int -> Picture -> Picture -> World
+initial seed playerBmp enemyBmp = World {
                         rndGen         = rndGen,
                         rotateAction   = NoRotation,
                         movementAction = NoMovement,
@@ -46,9 +47,28 @@ initial seed = World {
                         particles      = [],
                         bullets        = [],
                         enemies        = [],
-                        enemyTimer     = 4
+                        enemySpawnTimer= 4,
+                        enemyImage     = enemyBmp
                      }
     where         
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 3000 
+<<<<<<< HEAD
     player = Player (100, 100) (0, 0) 0
+=======
+    player = Player (100, 100) (0, 0) 0 playerBmp
+    
+emptyWorld :: World -> World
+emptyWorld world@(World{..})= 
+        world {
+                rotateAction   = NoRotation,
+                movementAction = NoMovement,
+                shootAction    = DontShoot,
+                player         = player',
+                bullets        = [],
+                enemies        = [],
+                enemySpawnTimer     = 4
+             }
+    where
+        player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
+>>>>>>> origin/master
