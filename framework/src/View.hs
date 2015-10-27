@@ -27,7 +27,7 @@ draw horizontalResolution' verticalResolution' world@(World{..})
     where
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
-        player'       = drawPlayer    player
+        player'       = drawPlayer'    player
         bullets'      = drawBullets   bullets
         enemies'      = drawEnemies   enemies
         viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
@@ -55,7 +55,11 @@ drawStar (Player{playerLocation}) (Star{location, depth}) = if shouldDraw then t
     p1            = (cameraOffsetX - width, cameraOffsetY - height)
     p2            = (cameraOffsetX + width, cameraOffsetY + height)
     shouldDraw    = pointInBox (nx, ny) p1 p2
-    
+  
+drawPlayer' :: Player -> Picture
+drawPlayer' player@(Player{..}) = translate x y $ rotate (90-direction) $ scale 2 2 $ playerImage
+    where 
+        (x, y) = playerLocation
 
 drawPlayer :: Player -> Picture
 drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 

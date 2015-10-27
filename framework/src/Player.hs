@@ -2,11 +2,13 @@
 
 module Player where
 
-import Graphics.Gloss (Vector, Point)
+import Graphics.Gloss (Vector, Point, Picture)
+
 
 data Player = Player {
         --Player location
         playerLocation  :: Point,
         playerSpeed     :: Vector,
-        direction       :: Float
+        direction       :: Float,
+        playerImage     :: Picture
     }

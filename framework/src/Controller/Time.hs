@@ -34,7 +34,7 @@ spawnDistance = 500
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) | isHit player enemies    = error "getBetter"
+timeHandler time world@(World {..}) | isHit player enemies    = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}--error "getBetter"
                                     | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemyTimer = newEnemyTimer}
     where
         updatedPlayer                       = updatePlayer time world        
