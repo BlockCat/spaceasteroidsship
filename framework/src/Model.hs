@@ -53,9 +53,6 @@ initial seed playerBmp enemyBmp = World {
     where         
     r1 = mkStdGen seed
     (stars, rndGen) = generateStarField r1 3000 
-<<<<<<< HEAD
-    player = Player (100, 100) (0, 0) 0
-=======
     player = Player (100, 100) (0, 0) 0 playerBmp
     
 emptyWorld :: World -> World
@@ -71,4 +68,3 @@ emptyWorld world@(World{..})=
              }
     where
         player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
->>>>>>> origin/master
