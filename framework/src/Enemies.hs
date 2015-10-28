@@ -51,7 +51,7 @@ jumperBehaviour enemy@(Enemy{..}) player@(Player{..}) time = enemy {enemyLocatio
 directionToPlayer :: Enemy -> Player -> Float
 directionToPlayer enemy@(Enemy{..}) player@(Player{..}) = direction
         where
-            direction = atan2 (-y) x
+            direction = atan2 y x
             (x, y)    = playerLocation - enemyLocation
             
 radToDeg x = x * 180 / pi
