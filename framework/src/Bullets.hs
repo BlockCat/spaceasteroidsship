@@ -15,7 +15,7 @@ data Bullet = Bullet {
 
 -- The drawing of the bullets    
 drawBullets :: [Bullet] -> Picture
-drawBullets xs = Pictures $ map drawShoot xs 
+drawBullets = Pictures . map drawShoot
 
 drawShoot :: Bullet -> Picture
 drawShoot Bullet{..} =  pictures [drawBullet 24 13, drawBullet (-24) 13]
@@ -27,12 +27,12 @@ bulletSpeedConstant = 5
 
 moveBullet :: Float -> Bullet -> Bullet
 moveBullet time Bullet{..} = Bullet{bulletLocation = location, ..}
-    where location = bulletLocation + (mulSV time bulletSpeed)
+    where location = bulletLocation + mulSV time bulletSpeed
 
 bulletOutOfWindow :: Bullet -> Bool
-bulletOutOfWindow Bullet{..} | (x > 1500 || x < (-1500) || y < (-1500) || y > 1500) = True
-                             | otherwise                                            = False
+bulletOutOfWindow Bullet{..} | x > 1500 || x < (-1500) || y < (-1500) || y > 1500 = True
+                             | otherwise                                          = False
     where (x, y) = bulletLocation
     
 filterOutOfRange :: [Bullet] -> [Bullet]
-filterOutOfRange bs = filter (not . bulletOutOfWindow) bs
+filterOutOfRange = filter (not . bulletOutOfWindow)

@@ -22,8 +22,7 @@ createStar rndGen = (Star (x, y) z, r3)
     where
         (x, r1) = randomR (-2000, 2000) rndGen
         (y, r2) = randomR (-2000, 2000) r1
-        (z, r3) = randomR (1, 4) r2
-        
+        (z, r3) = randomR (1, 4) r2        
             
 generateStarField :: StdGen -> Int -> ([Star], StdGen)
-generateStarField rndGen n = generateRandom rndGen createStar n
+generateStarField rndGen = generateRandom rndGen createStar

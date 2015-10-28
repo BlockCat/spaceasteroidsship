@@ -9,7 +9,6 @@ import Graphics.Gloss
 
 import RandomUtils
 
-    
 data Particle = Particle {
         -- Event queue
         location        :: Point,
@@ -17,9 +16,6 @@ data Particle = Particle {
         lifetime        :: Float,
         drawing         :: Picture
     } deriving Show
-                
-createParticle :: Point -> Vector -> Float -> Picture -> Particle
-createParticle loc spd life pict = Particle loc spd life pict
             
 randomizedParticle :: Float -> Float -> Float -> Particle -> StdGen -> (Particle, StdGen)
 randomizedParticle spdVar degVar lifeVar particle@(Particle {..}) rndGen = (particle{speed = newSpeed, lifetime = lifetime + lifeVariation}, r3)    
@@ -34,7 +30,7 @@ explosion :: Point -> StdGen -> ([Particle], StdGen)
 explosion loc rndGen = (outerExplosion ++ middleExplosion ++ innerExplosion , r3)
     where
         speedVar                   = 16
-        particleCreator speed pict = randomizedParticle speedVar 180 5 (createParticle loc (speed, 0) 4 pict)
+        particleCreator speed pict = randomizedParticle speedVar 180 5 $ Particle loc (speed, 0) 4 pict
         (innerExplosion,  r1)      = generateRandom rndGen ((particleCreator 20 . color yellow . circleSolid) 1) 1000
         (outerExplosion,  r2)      = generateRandom r1     ((particleCreator 30 . color red    . circleSolid) 1) 1000
         (middleExplosion, r3)      = generateRandom r1     ((particleCreator 25 . color orange . circleSolid) 1) 1000

@@ -35,7 +35,7 @@ hitBox = 15
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) | isHit player enemies    = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}--error "getBetter"
+timeHandler time world@(World {..}) | isHit player enemies    = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
                                     | otherwise               = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer}
     where
         updatedPlayer                       = updatePlayer time world        
@@ -100,7 +100,7 @@ createThrustParticles (World{player, movementAction, rndGen}) = if movementActio
         speed       = 0.3
         pict = color yellow $ circleSolid 2
         
-        particle = createParticle (playerLocation player) (playerSpeed player * (negate speed, negate speed)) lifeTime pict
+        particle = Particle (playerLocation player) (playerSpeed player * (negate speed, negate speed)) lifeTime pict
         randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 30
     
 --------------Player end -----------------------------------   

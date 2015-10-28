@@ -1,4 +1,4 @@
-{-# LANGUAGE DisambiguateRecordFields, NamedFieldPuns, RecordWildCards#-}
+{-# LANGUAGE DisambiguateRecordFields, NamedFieldPuns#-}
 
 module RandomUtils where
 

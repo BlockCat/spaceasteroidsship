@@ -57,13 +57,13 @@ initial seed playerBmp enemyBmp = World {
 emptyWorld :: World -> World
 emptyWorld world@(World{..})= 
         world {
-                rotateAction   = NoRotation,
-                movementAction = NoMovement,
-                shootAction    = DontShoot,
-                player         = player',
-                bullets        = [],
-                enemies        = [],
-                enemySpawnTimer     = 4
+                rotateAction    = NoRotation,
+                movementAction  = NoMovement,
+                shootAction     = DontShoot,
+                player          = player,
+                bullets         = [],
+                enemies         = [],
+                enemySpawnTimer = 4
              }
     where
-        player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
+        player = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
