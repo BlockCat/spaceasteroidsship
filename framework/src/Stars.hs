@@ -13,8 +13,8 @@ import RandomUtils
 
 data Star = Star {
         -- Event queue
-        location        :: Point,
-        depth           :: Float
+        starLocation        :: Point,
+        starDepth           :: Float
     }
  
 createStar :: StdGen -> (Star, StdGen)

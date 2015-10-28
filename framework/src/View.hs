@@ -22,46 +22,41 @@ verticalResolution = 600.0
 
 draw :: Float -> Float -> World -> Picture
 draw horizontalResolution' verticalResolution' world@(World{..})
-    = translate cameraOffsetX cameraOffsetY $ Pictures [stars', boundary', particles', player', enemies', bullets', viewPort]
+    = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets']
 
     where
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
-        player'       = drawPlayer'    player
+        player'       = drawPlayer    player
         bullets'      = drawBullets   bullets
         enemies'      = drawEnemies   enemies enemyImage
-        viewPort      = translate (negate cameraOffsetX) (negate cameraOffsetY) $ color red $ rectangleWire 1000 700
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player
         cameraOffsetY = (negate . snd . playerLocation) player        
     
 drawStars :: Player -> [Star] -> Picture
-drawStars player xs = Pictures $ map (drawStar player) xs
+drawStars player = Pictures . map (drawStar player)
 
 drawStar :: Player -> Star -> Picture
-drawStar (Player{playerLocation}) (Star{location, depth}) = if shouldDraw then translate nx ny picture else blank
+drawStar Player{..} Star{..} | shouldDraw = translate nx ny picture 
+                             | otherwise  = blank
     where
-    px = fst playerLocation
-    py = snd playerLocation
-    sx = fst location
-    sy = snd location
-    nx = sx - px/(depth*depth)
-    ny = sy - py/(depth*depth)
-    
-    picture = color white (circleSolid (4 - depth))
-    (cameraOffsetX , cameraOffsetY) = playerLocation
-    width         = 600
-    height        = 300
-    p1            = (cameraOffsetX - width, cameraOffsetY - height)
-    p2            = (cameraOffsetX + width, cameraOffsetY + height)
-    shouldDraw    = pointInBox (nx, ny) p1 p2
+    (px, py)   = playerLocation
+    (sx, sy)   = starLocation
+    (nx, ny)   = (sx - px/starDepth^2, sy - py/starDepth^2)    
+    picture    = (color white . circleSolid) (4 - starDepth)
+    width      = 600
+    height     = 300
+    p1         = (px - width, py - height)
+    p2         = (px + width, py + height)
+    shouldDraw = pointInBox (nx, ny) p1 p2
   
-drawPlayer' :: Player -> Picture
-drawPlayer' player@(Player{..}) = translate x y $ rotate (90-direction) $ scale 2 2 $ playerImage
+drawPlayer :: Player -> Picture
+drawPlayer player@(Player{..}) = (translate x y . rotate (90-direction) . scale 2 2) playerImage
     where 
         (x, y) = playerLocation
 
-drawPlayer :: Player -> Picture
+{-drawPlayer :: Player -> Picture
 drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 
                   color red lowerShootTriangleL, color red shootRectR, color red shootRectL, color red upperShootTriangleR, color red upperShootTriangleL, color grey lowerShootTriangleR2, color grey lowerShootTriangleL2, color grey upperShootTriangleR2, color grey upperShootTriangleL2]
     where 
@@ -85,4 +80,4 @@ drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 
     
 -- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
 drawRectangle :: Float -> Float -> Float -> Float -> Picture
-drawRectangle x y width = translate x y . rectangleSolid width
+drawRectangle x y width = translate x y . rectangleSolid width-}
