@@ -15,4 +15,4 @@ generateRandom rndGen f n = createReturn list
         createReturn [(s, r)]   = ([s], r)
         createReturn ((s, r):xs)= (s:s', r)
             where 
-                (s', r') = createReturn xs
+                (s', _) = createReturn xs
