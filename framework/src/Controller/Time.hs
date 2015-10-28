@@ -86,7 +86,6 @@ shootBullet time Shoot (Player {..}) bs = b: map (moveBullet time) bs
     where b = Bullet playerLocation (rotateV (direction*pi / 180) (bulletVelocity, 0)) direction
 shootBullet time _ _ bs = map (moveBullet time) bs
 
-
 createThrustParticles :: World -> ([Particle], StdGen)
 createThrustParticles (World{player, movementAction, rndGen}) | movementAction == Thrust = randParticles
                                                               | otherwise                = ([], rndGen)
@@ -115,7 +114,8 @@ spawnRandomEnemy ellapsed world@(World {..}) stdGen
         enemyTimer'     = enemySpawnTimer - ellapsed        
         (timeDiff, r1)  = randomR ((-0.75), 0.75) rndGen
         (enemy,    r2)  = spawnEnemyAtRandomLocation r1
-        enemies'        = if shouldSpawn enemy player then enemy:enemies else enemies
+        enemies'        | shouldSpawn enemy player = enemy:enemies 
+                        | otherwise                = enemies
         
 updateEnemies :: Float -> Player -> [Enemy] -> [Enemy]
 updateEnemies time player xs = map (\x -> (updateEnemy x) x player time) xs

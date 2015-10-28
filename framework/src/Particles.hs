@@ -47,5 +47,4 @@ drawParticles xs = Pictures $ map drawParticle xs
 drawParticle :: Particle -> Picture
 drawParticle (Particle{..}) = translate x y drawing
     where
-    x = fst location
-    y = snd location
+    (x, y) = location
