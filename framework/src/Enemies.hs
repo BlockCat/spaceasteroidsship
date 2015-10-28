@@ -25,7 +25,7 @@ drawEnemy pict Enemy{..} = translate x y (color red triangle)
               
               
 spawnEnemyAtRandomLocation :: StdGen -> (Enemy, StdGen)
-spawnEnemyAtRandomLocation stdGen = (Enemy {enemyLocation = (x', y'), enemyDirection = 0, updateEnemy = jumperBehaviour, enemyTimer = 4}, r2)
+spawnEnemyAtRandomLocation stdGen = (Enemy {enemyLocation = (x', y'), enemyDirection = 0, updateEnemy = simpleBehaviour, enemyTimer = 4}, r2)
     where
         (x', r1) = randomR (-1000, 1000) stdGen 
         (y', r2) = randomR (-1000, 1000) r1

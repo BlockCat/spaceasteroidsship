@@ -29,7 +29,8 @@ data World = World {
         bullets          :: [Bullet],
         enemies          :: [Enemy],
         enemySpawnTimer  :: Float,
-        enemyImage       :: Picture
+        enemyImage       :: Picture,
+        playerScore      :: Int
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
@@ -48,7 +49,8 @@ initial seed playerBmp enemyBmp = World {
                         bullets        = [],
                         enemies        = [],
                         enemySpawnTimer= 4,
-                        enemyImage     = enemyBmp
+                        enemyImage     = enemyBmp,
+                        playerScore    = 0
                      }
     where         
     (stars, rndGen) = generateStarField (mkStdGen seed) 3000 
@@ -63,7 +65,8 @@ emptyWorld world@(World{..})=
                 player          = player',
                 bullets         = [],
                 enemies         = [],
-                enemySpawnTimer = 4
+                enemySpawnTimer = 4,
+                playerScore     = 0
              }
     where
         player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}

@@ -34,15 +34,17 @@ hitBox = 15
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
-                                    | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer}
+timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ (fst $ explosion (playerLocation player) rndGen)}
+                                    | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer, playerScore = newScore}
     where
         updatedPlayer                       = updatePlayer time world        
         (thrustParticles, r1)               = createThrustParticles world
         newParticles                        = thrustParticles ++ updateParticles time particles
         newBullets                          = shootBullet time shootAction player (filterOutOfRange bullets)
         (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r1
-        newEnemies                          = updateEnemies time player enemies1        
+        enemies2                            = checkEnemies bullets enemies1
+        newScore                            = playerScore + 10 * ((length enemies1) - (length enemies2)) 
+        newEnemies                          = updateEnemies time player enemies2
         
 --------------Player stuff -----------------------------------      
 updatePlayer :: Float -> World -> Player
@@ -54,9 +56,12 @@ isHit :: Player -> [Enemy] -> Bool
 isHit player = any (hitCheck player) 
                          
 hitCheck :: Player -> Enemy -> Bool
-hitCheck Player{..} Enemy{..} = distance < hitBox 
+hitCheck Player{..} Enemy{..} = distance < hitBox   
     where 
         distance = magV (enemyLocation - playerLocation)
+        
+
+                          
 
         
 rotatePlayer :: RotateAction -> Player-> Player
@@ -116,6 +121,15 @@ spawnRandomEnemy ellapsed world@(World {..}) stdGen
         
 updateEnemies :: Float -> Player -> [Enemy] -> [Enemy]
 updateEnemies time player = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
+
+checkEnemies :: [Bullet] -> [Enemy] -> [Enemy]
+checkEnemies bullets enemies = filter (not.hitBullet bullets) enemies
+
+hitBullet :: [Bullet] -> Enemy -> Bool
+hitBullet bullets Enemy{..} = or $ map (\x -> hitBox > distance x) bullets
+    where
+        hitBox   = 20
+        distance Bullet{..} = magV (bulletLocation - enemyLocation)     
 
 shouldSpawn :: Enemy -> Player -> Bool
 shouldSpawn Enemy{..} Player{..} = magV (enemyLocation - playerLocation) > spawnDistance   
