@@ -22,9 +22,11 @@ verticalResolution = 600.0
 
 draw :: Float -> Float -> World -> Picture
 draw horizontalResolution' verticalResolution' world@(World{..})
-    = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets']
+    = Pictures [relativePict, staticPict]
 
     where
+        relativePict  = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets']
+        staticPict    = Pictures [score']
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
         player'       = drawPlayer    player
@@ -32,7 +34,8 @@ draw horizontalResolution' verticalResolution' world@(World{..})
         enemies'      = drawEnemies   enemies enemyImage
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player
-        cameraOffsetY = (negate . snd . playerLocation) player        
+        cameraOffsetY = (negate . snd . playerLocation) player
+        score'        = drawScore playerScore
     
 drawStars :: Player -> [Star] -> Picture
 drawStars player = Pictures . map (drawStar player)
@@ -56,28 +59,5 @@ drawPlayer player@(Player{..}) = (translate x y . rotate (90-direction) . scale 
     where 
         (x, y) = playerLocation
 
-{-drawPlayer :: Player -> Picture
-drawPlayer player@(Player {playerLocation, direction}) = (translate x y . scale 0.6 0.6 . pictures) [color red fillTriangleL, color red fillTriangleR,color white bodyTriangle1, color blue bodyTriangle2, color red lowerShootTriangleR, 
-                  color red lowerShootTriangleL, color red shootRectR, color red shootRectL, color red upperShootTriangleR, color red upperShootTriangleL, color grey lowerShootTriangleR2, color grey lowerShootTriangleL2, color grey upperShootTriangleR2, color grey upperShootTriangleL2]
-    where 
-    fillTriangleR        = rotate (90-direction :: Float)  $ polygon       [(35, -20), (40, -20), (35, -10)]
-    fillTriangleL        = rotate (90-direction :: Float)  $ polygon       [(-40, -20), (-35, -20), (-35, -10)]
-    bodyTriangle1        = rotate (90-direction :: Float)  $ polygon       [(-40, -20), (40, -20), (0, 20)]
-    bodyTriangle2        = rotate (90-direction :: Float)  $ polygon       [(-25, -15), (25, -15), (0, 10)]
-    lowerShootTriangleR  = rotate (90-direction :: Float)  $ polygon       [(35, -10), (45, -10), (40, -20)]
-    lowerShootTriangleL  = rotate (90-direction :: Float)  $ polygon       [(-45, -10), (-35, -10), (-40, -20)]
-    shootRectR           = rotate (90-direction :: Float)  $ drawRectangle 40 (-5) 10 10
-    shootRectL           = rotate (90-direction :: Float)  $ drawRectangle (-40) (-5) 10 10 
-    upperShootTriangleR  = rotate (90-direction :: Float)  $ polygon       [(35, 0), (45, 0), (40, 20)]
-    upperShootTriangleL  = rotate (90-direction :: Float)  $ polygon       [(-45, 0), (-35, 0), (-40, 20)]
-    lowerShootTriangleR2 = rotate (90-direction :: Float)  $ polygon       [(37, -3), (43, -3), (40, -18)]
-    lowerShootTriangleL2 = rotate (90-direction :: Float)  $ polygon       [(-43, -3), (-37, -3), (-40, -18)]
-    upperShootTriangleR2 = rotate (90-direction :: Float)  $ polygon       [(37, -3), (43, -3), (40, 15)]
-    upperShootTriangleL2 = rotate (90-direction :: Float)  $ polygon       [(-43, -3), (-37, -3), (-40, 15)]
-    
-    grey                 = greyN 0.4
-    (x, y)               = playerLocation
-    
--- Draws a rectangle with the x and y coordinate of middle of rectangle + the width and height 
-drawRectangle :: Float -> Float -> Float -> Float -> Picture
-drawRectangle x y width = translate x y . rectangleSolid width-}
+drawScore  :: Int -> Picture
+drawScore score = (translate (-405) (250) . scale 0.2 0.2 . color yellow . text) ("Score: " ++ (show score))
