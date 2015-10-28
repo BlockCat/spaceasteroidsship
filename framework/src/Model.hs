@@ -60,10 +60,10 @@ emptyWorld world@(World{..})=
                 rotateAction    = NoRotation,
                 movementAction  = NoMovement,
                 shootAction     = DontShoot,
-                player          = player,
+                player          = player',
                 bullets         = [],
                 enemies         = [],
                 enemySpawnTimer = 4
              }
     where
-        player = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
+        player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}
