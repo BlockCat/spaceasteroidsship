@@ -23,17 +23,17 @@ import Controller
 
 main :: IO ()
 main = do
-    args           <- getArgs
-    time           <- round <$> getPOSIXTime
-    Just playerBmp <- loadJuicyPNG "testSpaceShip.png"
-    Just enemyBmp  <- loadJuicyPNG "testEnemy.png"
+    args               <- getArgs
+    time               <- round <$> getPOSIXTime
+    Just playerBmp     <- loadJuicyPNG "testSpaceShip.png"
+    Just enemyBmp      <- loadJuicyPNG "testEnemy.png"
     let initial'        = initial time playerBmp enemyBmp
         (w, h, display) = chooseDisplay args
         background      = black
         fps             = 60
     play display background fps initial' (draw w h) eventHandler timeHandler
 
--- | Choose a display mode. Note that the resolution of a full screen mode
+--   Choose a display mode. Note that the resolution of a full screen mode
 --   should likely match the resolution of your monitor exactly.
 chooseDisplay :: [String] -> (Float, Float, Display)
 chooseDisplay []

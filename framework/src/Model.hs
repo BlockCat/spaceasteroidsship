@@ -28,7 +28,7 @@ data World = World {
         particles        :: [Particle],
         bullets          :: [Bullet],
         enemies          :: [Enemy],
-        enemySpawnTimer       :: Float,
+        enemySpawnTimer  :: Float,
         enemyImage       :: Picture
     }
     
@@ -51,9 +51,8 @@ initial seed playerBmp enemyBmp = World {
                         enemyImage     = enemyBmp
                      }
     where         
-    r1 = mkStdGen seed
-    (stars, rndGen) = generateStarField r1 3000 
-    player = Player (100, 100) (0, 0) 0 playerBmp
+    (stars, rndGen) = generateStarField (mkStdGen seed) 3000 
+    player          = Player (100, 100) (0, 0) 0 playerBmp
     
 emptyWorld :: World -> World
 emptyWorld world@(World{..})= 
