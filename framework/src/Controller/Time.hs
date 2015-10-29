@@ -34,7 +34,7 @@ hitBox = 15
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ (fst $ explosion (playerLocation player) rndGen)}
+timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
                                     | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer, playerScore = newScore}
     where
         updatedPlayer                       = updatePlayer time world        
@@ -43,7 +43,7 @@ timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) 
         newBullets                          = shootBullet time shootAction player (filterOutOfRange bullets)
         (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r1
         enemies2                            = checkEnemies bullets enemies1
-        newScore                            = playerScore + 10 * ((length enemies1) - (length enemies2)) 
+        newScore                            = playerScore + 10 * (length enemies1 - length enemies2) 
         newEnemies                          = updateEnemies time player enemies2
         
 --------------Player stuff -----------------------------------      
@@ -124,10 +124,10 @@ updateEnemies time player = moveEnemies . updatedEnemies
         updatedEnemies = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
 
 checkEnemies :: [Bullet] -> [Enemy] -> [Enemy]
-checkEnemies bullets enemies = filter (not . hitBullet bullets) enemies
+checkEnemies bullets = filter (not . hitBullet bullets)
 
 hitBullet :: [Bullet] -> Enemy -> Bool
-hitBullet bullets Enemy{..} = or $ map (\x -> hitBox > distance x) bullets
+hitBullet bullets Enemy{..} = any (\x -> hitBox > distance x) bullets
     where
         hitBox   = 20
         distance Bullet{..} = magV (bulletLocation - enemyLocation)     
