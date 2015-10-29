@@ -58,10 +58,7 @@ isHit player = any (hitCheck player)
 hitCheck :: Player -> Enemy -> Bool
 hitCheck Player{..} Enemy{..} = distance < hitBox   
     where 
-        distance = magV (enemyLocation - playerLocation)
-        
-
-                          
+        distance = magV (enemyLocation - playerLocation)                          
 
         
 rotatePlayer :: RotateAction -> Player-> Player
@@ -120,7 +117,9 @@ spawnRandomEnemy ellapsed world@(World {..}) stdGen
                         | otherwise                = enemies        -- Verplaatsen naar random, omdat die alleen random plek genereerd. Verder zo doen dat als niet shouldspawn, dan nieuwe enemy genereren.
         
 updateEnemies :: Float -> Player -> [Enemy] -> [Enemy]
-updateEnemies time player = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
+updateEnemies time player = moveEnemies . updatedEnemies
+    where
+        updatedEnemies = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
 
 checkEnemies :: [Bullet] -> [Enemy] -> [Enemy]
 checkEnemies bullets enemies = filter (not.hitBullet bullets) enemies
