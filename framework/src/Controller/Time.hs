@@ -82,9 +82,11 @@ wrapPlayer Player {..} = Player{playerLocation = (wrap (-1000) 1000 x, wrap (-10
                           | otherwise = x      
 
 shootBullet :: Float -> ShootAction -> Player -> [Bullet] -> [Bullet]
-shootBullet time DontShoot _ = map (moveBullet time) 
-shootBullet time _ (Player {..}) = (b :) . map (moveBullet time) 
-    where b = Bullet playerLocation (rotateV (direction*pi / 180) (bulletVelocity, 0)) direction
+shootBullet time DontShoot _ = map (moveBullet time)
+shootBullet time _ (Player {..}) = (bulletPos 21 (-11) :) . (bulletPos (-21) (-11) :) . map (moveBullet time) 
+    where (x, y)        = playerLocation          
+          bulletPos i j = Bullet (x+k, y+l) (rotateV (direction*pi / 180) (bulletVelocity, 0)) direction
+              where (k, l) = rotateV (degToRad (90+direction)) (i, j)
 
 createThrustParticles :: World -> ([Particle], StdGen)
 createThrustParticles (World{player, movementAction, rndGen}) | movementAction == Thrust = randParticles
@@ -122,7 +124,7 @@ updateEnemies time player = moveEnemies . updatedEnemies
         updatedEnemies = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
 
 checkEnemies :: [Bullet] -> [Enemy] -> [Enemy]
-checkEnemies bullets enemies = filter (not.hitBullet bullets) enemies
+checkEnemies bullets enemies = filter (not . hitBullet bullets) enemies
 
 hitBullet :: [Bullet] -> Enemy -> Bool
 hitBullet bullets Enemy{..} = or $ map (\x -> hitBox > distance x) bullets

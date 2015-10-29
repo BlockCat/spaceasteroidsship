@@ -5,6 +5,7 @@ module Enemies where
 import Graphics.Gloss
 import System.Random
 import Graphics.Gloss.Data.Vector
+import Graphics.Gloss.Geometry.Angle
 import Player
 
 data Enemy = Enemy {
@@ -71,7 +72,3 @@ directionToPlayer enemy@(Enemy{..}) player@(Player{..}) = direction
         where
             direction = atan2 y x
             (x, y)    = playerLocation - enemyLocation
-            
-radToDeg x = x * 180 / pi
-degToRad x = x * pi / 180
-            

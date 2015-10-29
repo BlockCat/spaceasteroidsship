@@ -18,9 +18,8 @@ drawBullets :: [Bullet] -> Picture
 drawBullets = Pictures . map drawShoot
 
 drawShoot :: Bullet -> Picture
-drawShoot Bullet{..} =  pictures [drawBullet 24 13, drawBullet (-24) 13]
-    where drawBullet i j = (color yellow . translate x y . rotate (90-bulletDir :: Float) . translate i j . circleSolid) 2
-          (x, y)         = bulletLocation
+drawShoot Bullet{..} =  (color yellow . translate x y . rotate (90-bulletDir :: Float) . circleSolid) 2
+    where (x, y) = bulletLocation
 
 -- The shooting and movement of bullets
 bulletSpeedConstant = 5
