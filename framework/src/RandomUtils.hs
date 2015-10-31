@@ -16,3 +16,11 @@ generateRandom rndGen f n = createReturn list
         createReturn ((s, r):xs)= (s:s', r)
             where 
                 (s', _) = createReturn xs
+                
+                
+randomLocation :: StdGen -> ((Float, Float), StdGen)
+randomLocation stdGen = ((x',y'), r2)
+    where
+        (x', r1) = randomR (-1000, 1000) stdGen 
+        (y', r2) = randomR (-1000, 1000) r1
+
