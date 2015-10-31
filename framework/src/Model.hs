@@ -12,6 +12,7 @@ import Stars
 import Particles
 import Bullets
 import Enemies
+import Multiplier
 
 -- | Game state
 
@@ -27,8 +28,10 @@ data World = World {
         starField        :: [Star],
         particles        :: [Particle],
         bullets          :: [Bullet],
+        multipliers      :: [Multiplier],
         enemies          :: [Enemy],
         enemySpawnTimer  :: Float,
+        multiplierTimer  :: Float,
         enemyImage       :: Picture,
         playerScore      :: Int
     }
@@ -39,18 +42,20 @@ data ShootAction    = Shoot      | DontShoot
 
 initial :: Int -> Picture -> Picture -> World
 initial seed playerBmp enemyBmp = World {
-                        rndGen         = rndGen,
-                        rotateAction   = NoRotation,
-                        movementAction = NoMovement,
-                        shootAction    = DontShoot,
-                        player         = player,
-                        starField      = stars,
-                        particles      = [],
-                        bullets        = [],
-                        enemies        = [],
-                        enemySpawnTimer= 4,
-                        enemyImage     = enemyBmp,
-                        playerScore    = 0
+                        rndGen          = rndGen,
+                        rotateAction    = NoRotation,
+                        movementAction  = NoMovement,
+                        shootAction     = DontShoot,
+                        player          = player,
+                        starField       = stars,
+                        particles       = [],
+                        bullets         = [],
+                        multipliers     = [],
+                        enemies         = [],
+                        enemySpawnTimer = 4,
+                        multiplierTimer = 6,
+                        enemyImage      = enemyBmp,
+                        playerScore     = 0
                      }
     where         
     (stars, rndGen) = generateStarField (mkStdGen seed) 3000 
@@ -64,7 +69,8 @@ emptyWorld world@(World{..})=
                 shootAction     = DontShoot,
                 player          = player',
                 bullets         = [],
-                enemies         = [],
+                multipliers     = [],
+                enemies         = [],                
                 enemySpawnTimer = 4,
                 playerScore     = 0
              }

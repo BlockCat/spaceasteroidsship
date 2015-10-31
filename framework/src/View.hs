@@ -13,6 +13,7 @@ import Stars
 import Particles
 import Bullets
 import Enemies
+import Multiplier
 
 -- | Drawing
 
@@ -25,12 +26,13 @@ draw horizontalResolution' verticalResolution' world@(World{..})
     = Pictures [relativePict, staticPict]
 
     where
-        relativePict  = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets']
+        relativePict  = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets', multipliers']
         staticPict    = Pictures [score']
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
         player'       = drawPlayer    player
         bullets'      = drawBullets   bullets
+        multipliers'  = drawMultipliers multipliers
         enemies'      = drawEnemies   enemies enemyImage
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player

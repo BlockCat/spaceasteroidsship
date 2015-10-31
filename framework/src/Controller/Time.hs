@@ -22,6 +22,7 @@ import RandomUtils
 import Particles
 import Bullets
 import Enemies
+import Multiplier
 
 rotationSpeed = 6
 
@@ -35,13 +36,14 @@ hitBox = 15
 
 timeHandler :: Float -> World -> World
 timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
-                                    | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, enemies = newEnemies, enemySpawnTimer = newEnemyTimer, playerScore = newScore}
+                                    | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, multipliers = newMultipliers, enemies = newEnemies, enemySpawnTimer = newEnemyTimer, multiplierTimer = newMultiTimer, playerScore = newScore}
     where
         updatedPlayer                       = updatePlayer time world        
         (thrustParticles, r1)               = createThrustParticles world
         newParticles                        = thrustParticles ++ updateParticles time particles
         newBullets                          = shootBullet time shootAction player (filterOutOfRange bullets)
-        (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r1
+        (newMultipliers, newMultiTimer, r2) = spawnRandomMultiplier time world r1
+        (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r2
         enemies2                            = checkEnemies bullets enemies1
         newScore                            = playerScore + 10 * (length enemies1 - length enemies2) 
         newEnemies                          = updateEnemies time player enemies2
@@ -117,6 +119,16 @@ spawnRandomEnemy ellapsed world@(World {..}) stdGen
         (enemy,    r2)  = spawnEnemyAtRandomLocation r1
         enemies'        | shouldSpawn enemy player = enemy:enemies 
                         | otherwise                = enemies        -- Verplaatsen naar random, omdat die alleen random plek genereerd. Verder zo doen dat als niet shouldspawn, dan nieuwe enemy genereren.
+                        
+spawnRandomMultiplier :: Float -> World -> StdGen -> ([Multiplier], Float, StdGen)
+spawnRandomMultiplier ellapsed world@(World {..}) stdGen
+        | multiplierTimer' > 0  = (multipliers ,  multiplierTimer', stdGen)
+        | otherwise             = (multipliers', 2 + timeDiff, r2)
+    where
+        multiplierTimer' = multiplierTimer - ellapsed        
+        (timeDiff, r1)   = randomR (-0.75, 0.75) rndGen
+        (multiplier, r2) = spawnMultiplierAtRandomLocation r1
+        multipliers'     = multiplier:multipliers 
         
 updateEnemies :: Float -> Player -> [Enemy] -> [Enemy]
 updateEnemies time player = moveEnemies . updatedEnemies
