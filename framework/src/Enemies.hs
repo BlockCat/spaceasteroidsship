@@ -7,6 +7,7 @@ import System.Random
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Angle
 import Player
+import Location
 
 data Enemy = Enemy {
         enemyLocation  :: Point,        
@@ -15,6 +16,10 @@ data Enemy = Enemy {
         enemyTimer     :: Float,
         updateEnemy    :: Enemy -> Player -> Float -> Enemy
     }
+instance Location Enemy where {
+    location e  = enemyLocation e    
+}
+    
 
 drawEnemies :: [Enemy] -> Picture -> Picture
 drawEnemies xs pict = Pictures $ map (drawEnemy pict) xs

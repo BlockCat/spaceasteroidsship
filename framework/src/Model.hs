@@ -33,15 +33,17 @@ data World = World {
         enemySpawnTimer  :: Float,
         multiplierTimer  :: Float,
         enemyImage       :: Picture,
-        playerScore      :: Int
+        multiplierImage  :: Picture,
+        playerScore      :: Int,
+        scoreMultiplier  :: Int
     }
     
 data RotateAction   = NoRotation | RotateLeft | RotateRight
 data MovementAction = NoMovement | Thrust deriving Eq
 data ShootAction    = Shoot      | DontShoot
 
-initial :: Int -> Picture -> Picture -> World
-initial seed playerBmp enemyBmp = World {
+initial :: Int -> Picture -> Picture -> Picture -> World
+initial seed playerPng enemyPng multiplierPng = World {
                         rndGen          = rndGen,
                         rotateAction    = NoRotation,
                         movementAction  = NoMovement,
@@ -54,12 +56,14 @@ initial seed playerBmp enemyBmp = World {
                         enemies         = [],
                         enemySpawnTimer = 4,
                         multiplierTimer = 6,
-                        enemyImage      = enemyBmp,
-                        playerScore     = 0
+                        enemyImage      = enemyPng,
+                        multiplierImage = multiplierPng,
+                        playerScore     = 0,
+                        scoreMultiplier = 1
                      }
     where         
     (stars, rndGen) = generateStarField (mkStdGen seed) 3000 
-    player          = Player (100, 100) (0, 0) 0 playerBmp
+    player          = Player (100, 100) (0, 0) 0 playerPng 0 True
     
 emptyWorld :: World -> World
 emptyWorld world@(World{..})= 
@@ -72,7 +76,8 @@ emptyWorld world@(World{..})=
                 multipliers     = [],
                 enemies         = [],                
                 enemySpawnTimer = 4,
-                playerScore     = 0
+                playerScore     = 0,
+                scoreMultiplier      = 1
              }
     where
         player' = player {playerLocation = (100, 100), playerSpeed = (0, 0)}

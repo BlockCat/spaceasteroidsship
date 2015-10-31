@@ -27,17 +27,18 @@ draw horizontalResolution' verticalResolution' world@(World{..})
 
     where
         relativePict  = (translate cameraOffsetX cameraOffsetY . Pictures) [stars', boundary', particles', player', enemies', bullets', multipliers']
-        staticPict    = Pictures [score']
+        staticPict    = Pictures [score', multiplier']
         stars'        = drawStars     player starField 
         particles'    = drawParticles particles
         player'       = drawPlayer    player
         bullets'      = drawBullets   bullets
-        multipliers'  = drawMultipliers multipliers
+        multipliers'  = drawMultipliers multiplierImage multipliers
         enemies'      = drawEnemies   enemies enemyImage
         boundary'     = color blue $ rectangleWire 2000 2000
         cameraOffsetX = (negate . fst . playerLocation) player
         cameraOffsetY = (negate . snd . playerLocation) player
-        score'        = drawScore playerScore
+        score'        = drawScore "Score: " (-405) playerScore
+        multiplier'   = drawScore "Multiplier: x" 350 scoreMultiplier
     
 drawStars :: Player -> [Star] -> Picture
 drawStars player = Pictures . map (drawStar player)
@@ -61,5 +62,5 @@ drawPlayer player@(Player{..}) = (translate x y . rotate (90-direction) . scale 
     where 
         (x, y) = playerLocation
 
-drawScore  :: Int -> Picture
-drawScore score = (translate (-405) (250) . scale 0.2 0.2 . color yellow . text) ("Score: " ++ (show score))
+drawScore  :: String -> Float -> Int -> Picture
+drawScore prefix x score = (translate x (250) . scale 0.2 0.2 . color yellow . text) (prefix ++ (show score))

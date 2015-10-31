@@ -23,6 +23,7 @@ import Particles
 import Bullets
 import Enemies
 import Multiplier
+import Location
 
 rotationSpeed = 6
 
@@ -35,33 +36,60 @@ hitBox = 15
 -- | Time handling
 
 timeHandler :: Float -> World -> World
-timeHandler time world@(World {..}) | isHit player enemies = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
-                                    | otherwise            = world {player = updatedPlayer, particles = newParticles, rndGen = newStd, bullets = newBullets, multipliers = newMultipliers, enemies = newEnemies, enemySpawnTimer = newEnemyTimer, multiplierTimer = newMultiTimer, playerScore = newScore}
+timeHandler time world@(World {..}) | fst $ isHit hitBox player enemies = (emptyWorld world) {particles = particles ++ fst (explosion (playerLocation player) rndGen)}
+                                    | otherwise            = world {
+                                                                    player          = updatedPlayer1, 
+                                                                    particles       = newParticles, 
+                                                                    rndGen          = newStd, 
+                                                                    bullets         = newBullets, 
+                                                                    multipliers     = newMultipliers3, 
+                                                                    enemies         = newEnemies,
+                                                                    enemySpawnTimer = newEnemyTimer, 
+                                                                    multiplierTimer = newMultiTimer, 
+                                                                    playerScore     = newScore,
+                                                                    scoreMultiplier = newMultiplier
+                                                                    }
     where
-        updatedPlayer                       = updatePlayer time world        
-        (thrustParticles, r1)               = createThrustParticles world
-        newParticles                        = thrustParticles ++ updateParticles time particles
-        newBullets                          = shootBullet time shootAction player (filterOutOfRange bullets)
-        (newMultipliers, newMultiTimer, r2) = spawnRandomMultiplier time world r1
-        (enemies1, newEnemyTimer, newStd)   = spawnRandomEnemy time world r2
-        enemies2                            = checkEnemies bullets enemies1
-        newScore                            = playerScore + 10 * (length enemies1 - length enemies2) 
-        newEnemies                          = updateEnemies time player enemies2
+        updatedPlayer                        = updatePlayer time world        
+        (thrustParticles, r1)                = createThrustParticles world
+        newParticles                         = thrustParticles ++ updateParticles time particles
+        (updatedPlayer1, newBullets)         = shootBullet time shootAction updatedPlayer (filterOutOfRange bullets)
+        (newMultipliers1, newMultiTimer, r2) = spawnRandomMultiplier time world r1
+        (enemies1, newEnemyTimer, newStd)    = spawnRandomEnemy time world r2
+        enemies2                             = checkEnemies bullets enemies1
+        (multiplierAdd, newMultipliers2)     = hitMultiplier player newMultipliers1
+        newMultipliers3                      = foldr (\b acc -> snd $ isHit 15 b acc) newMultipliers2 bullets
+        newMultiplier                        = scoreMultiplier + multiplierAdd
+        newScore                             = playerScore + scoreMultiplier * (length enemies1 - length enemies2) 
+        newEnemies                           = updateEnemies time player enemies2
         
 --------------Player stuff -----------------------------------      
 updatePlayer :: Float -> World -> Player
-updatePlayer time World{..} = p {playerLocation = playerLocation p + mulSV time (playerSpeed p)}
+updatePlayer time World{..} = p {playerLocation = location p + mulSV time (playerSpeed p), shootTimer = shootTimer', canShoot = canShoot'}
     where
-        p  = (wrapPlayer . movePlayer movementAction . rotatePlayer rotateAction) player      
+        p           = (wrapPlayer . movePlayer movementAction . rotatePlayer rotateAction) player
+        shootTimer' = if shootTimer p - time > 0 && (not.canShoot) p then shootTimer p - time else 0
+        canShoot'   = shootTimer' <= 0
+                    
                          
-isHit :: Player -> [Enemy] -> Bool
-isHit player = any (hitCheck player) 
+isHit :: (Location a, Location b) => Float -> a -> [b] -> (Bool, [b])
+isHit hitRadius p1 xs | hasCollided = (True, newList)
+                      | otherwise   = (False, xs)
+    where
+        list        = map (\x -> (hitCheck hitRadius p1 x, x)) xs
+        hasCollided = or $ map hit list
+        hit (x, _)  = x
+        newList     = (map snd . filter (not.hit)) list      
                          
-hitCheck :: Player -> Enemy -> Bool
-hitCheck Player{..} Enemy{..} = distance < hitBox   
-    where 
-        distance = magV (enemyLocation - playerLocation)                          
+hitCheck :: (Location a, Location b) => Float -> a -> b -> Bool
+hitCheck hitRadius p1 p2 = (magV (location p1 - location p2)) < hitRadius
 
+hitMultiplier :: (Location a, Location b) => a -> [b] -> (Int, [b])
+hitMultiplier p1 xs | collided  = (1, newList)
+                    | otherwise = (0, newList)
+    where
+    (collided, newList) = isHit 30 p1 xs
+      
         
 rotatePlayer :: RotateAction -> Player-> Player
 rotatePlayer RotateLeft  player = player {direction = direction player + rotationSpeed}
@@ -83,12 +111,15 @@ wrapPlayer Player {..} = Player{playerLocation = (wrap (-1000) 1000 x, wrap (-10
                           | x > high = high
                           | otherwise = x      
 
-shootBullet :: Float -> ShootAction -> Player -> [Bullet] -> [Bullet]
-shootBullet time DontShoot _ = map (moveBullet time)
-shootBullet time _ (Player {..}) = (bulletPos 21 (-11) :) . (bulletPos (-21) (-11) :) . map (moveBullet time) 
-    where (x, y)        = playerLocation          
-          bulletPos i j = Bullet (x+k, y+l) (rotateV (direction*pi / 180) (bulletVelocity, 0)) direction
+shootBullet :: Float -> ShootAction -> Player -> [Bullet] -> (Player, [Bullet])
+shootBullet time DontShoot p               xs = (p, map (moveBullet time) xs)
+shootBullet time Shoot     p@(Player {..}) xs | canShoot = (p {canShoot = False, shootTimer = 0.34},(bulletPos 21 (-11)) :(bulletPos (-21) (-11)) : (map (moveBullet time) xs))
+                                              | otherwise  = (p, map (moveBullet time) xs)
+    where 
+        (x, y)        = playerLocation        
+        bulletPos i j = Bullet (x+k, y+l) (rotateV (direction*pi / 180) (bulletVelocity, 0)) direction
               where (k, l) = rotateV (degToRad (90+direction)) (i, j)
+
 
 createThrustParticles :: World -> ([Particle], StdGen)
 createThrustParticles (World{player, movementAction, rndGen}) | movementAction == Thrust = randParticles
@@ -136,13 +167,7 @@ updateEnemies time player = moveEnemies . updatedEnemies
         updatedEnemies = map (\enemy@Enemy{..} -> updateEnemy enemy player time) 
 
 checkEnemies :: [Bullet] -> [Enemy] -> [Enemy]
-checkEnemies bullets = filter (not . hitBullet bullets)
-
-hitBullet :: [Bullet] -> Enemy -> Bool
-hitBullet bullets Enemy{..} = any (\x -> hitBox > distance x) bullets
-    where
-        hitBox   = 20
-        distance Bullet{..} = magV (bulletLocation - enemyLocation)     
+checkEnemies bullets = filter (\x -> (not (fst (isHit 20 x bullets)))) 
 
 shouldSpawn :: Enemy -> Player -> Bool
 shouldSpawn Enemy{..} Player{..} = magV (enemyLocation - playerLocation) > spawnDistance   

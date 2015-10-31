@@ -8,14 +8,19 @@ import Graphics.Gloss.Data.Point
 import Graphics.Gloss
 
 import RandomUtils
+import Location
 
 data Particle = Particle {
         -- Event queue
-        location        :: Point,
+        particleLoc     :: Point,
         speed           :: Vector,
         lifetime        :: Float,
         drawing         :: Picture
     } deriving Show
+    
+instance Location Particle where {
+        location = particleLoc
+    }
             
 randomizedParticle :: Float -> Float -> Float -> Particle -> StdGen -> (Particle, StdGen)
 randomizedParticle spdVar degVar lifeVar particle@(Particle {..}) rndGen = (particle{speed = newSpeed, lifetime = lifetime + lifeVariation}, r3)    
@@ -39,7 +44,7 @@ updateParticles :: Float -> [Particle] -> [Particle]
 updateParticles elapsed xs = filter (\particle -> lifetime particle > 0) (map (updateParticle elapsed) xs) 
 
 updateParticle  :: Float -> Particle -> Particle
-updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, location = location + (mulSV elapsed speed)}
+updateParticle elapsed particle@(Particle{..}) = particle {lifetime = lifetime - elapsed, particleLoc = particleLoc + (mulSV elapsed speed)}
 
 drawParticles :: [Particle] -> Picture
 drawParticles xs = Pictures $ map drawParticle xs
@@ -47,4 +52,4 @@ drawParticles xs = Pictures $ map drawParticle xs
 drawParticle :: Particle -> Picture
 drawParticle (Particle{..}) = translate x y drawing
     where
-    (x, y) = location
+    (x, y) = particleLoc

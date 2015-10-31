@@ -7,18 +7,20 @@ import System.Random
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Angle
 import Player
+import Location
 
 data Multiplier = Multiplier {
         multiplierLocation  :: Point
     }
+instance Location Multiplier where {
+    location = multiplierLocation
+    }
+drawMultipliers :: Picture -> [Multiplier] -> Picture
+drawMultipliers pict xs = Pictures $ map (drawMultiplier pict) xs
 
-drawMultipliers :: [Multiplier] -> Picture
-drawMultipliers xs = Pictures $ map drawMultiplier xs
-
-drawMultiplier :: Multiplier -> Picture
-drawMultiplier Multiplier{..} = translate x y (color green triangle)
-    where 
-        triangle = polygon [(-10, -5), (10, -5), (0, 10)]
+drawMultiplier :: Picture -> Multiplier -> Picture
+drawMultiplier picture Multiplier{..} = translate x y picture
+    where         
         (x, y)   = multiplierLocation              
               
 spawnMultiplierAtRandomLocation :: StdGen -> (Multiplier, StdGen)

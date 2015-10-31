@@ -25,9 +25,10 @@ main :: IO ()
 main = do
     args               <- getArgs
     time               <- round <$> getPOSIXTime
-    Just playerBmp     <- loadJuicyPNG "testSpaceShip.png"
-    Just enemyBmp      <- loadJuicyPNG "testEnemy.png"
-    let initial'        = initial time playerBmp enemyBmp
+    Just playerPng     <- loadJuicyPNG "testSpaceShip.png"
+    Just enemyPng      <- loadJuicyPNG "testEnemy.png"
+    Just multiplierPng <- loadJuicyPNG "testMultiplier.png"
+    let initial'        = initial time playerPng enemyPng multiplierPng
         (w, h, display) = chooseDisplay args
         background      = black
         fps             = 60

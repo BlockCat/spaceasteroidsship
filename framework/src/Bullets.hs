@@ -6,11 +6,16 @@ import System.Random
 import Graphics.Gloss
 import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Angle
+
+import Location
     
 data Bullet = Bullet {
         bulletLocation  :: Point,
         bulletSpeed     :: Vector,
         bulletDir       :: Float
+    }
+instance Location Bullet where {
+        location = bulletLocation
     }
 
 -- The drawing of the bullets    
