@@ -8,6 +8,7 @@ import Graphics.Gloss.Data.Vector
 import Graphics.Gloss.Geometry.Angle
 import Player
 import Location
+import RandomUtils
 
 data Multiplier = Multiplier {
         multiplierLocation  :: Point
@@ -25,7 +26,6 @@ drawMultiplier picture Multiplier{..} = translate x y picture
         (x, y)   = multiplierLocation              
               
 spawnMultiplierAtRandomLocation :: StdGen -> (Multiplier, StdGen)
-spawnMultiplierAtRandomLocation stdGen = (Multiplier (x', y'), r2)
+spawnMultiplierAtRandomLocation stdGen = (Multiplier loc, newStdGen)
     where
-        (x', r1) = randomR (-1000, 1000) stdGen 
-        (y', r2) = randomR (-1000, 1000) r1
+        (loc, newStdGen) = randomLocation stdGen

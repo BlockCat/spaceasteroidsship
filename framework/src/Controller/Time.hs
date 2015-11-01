@@ -73,23 +73,7 @@ updatePlayer time World{..} = p {playerLocation = location p + mulSV time (playe
         canShoot'   = shootTimer' <= 0
                     
                          
-isHit :: (Location a, Location b) => Float -> a -> [b] -> (Bool, [b])
-isHit hitRadius p1 xs | hasCollided = (True, newList)
-                      | otherwise   = (False, xs)
-    where
-        list        = map (\x -> (hitCheck hitRadius p1 x, x)) xs
-        hasCollided = or $ map hit list
-        hit (x, _)  = x
-        newList     = (map snd . filter (not.hit)) list      
-                         
-hitCheck :: (Location a, Location b) => Float -> a -> b -> Bool
-hitCheck hitRadius p1 p2 = (magV (location p1 - location p2)) < hitRadius
 
-hitMultiplier :: (Location a, Location b) => a -> [b] -> (Int, [b])
-hitMultiplier p1 xs | collided  = (1, newList)
-                    | otherwise = (0, newList)
-    where
-    (collided, newList) = isHit 30 p1 xs
       
         
 rotatePlayer :: RotateAction -> Player-> Player
@@ -102,7 +86,7 @@ movePlayer NoMovement player@(Player {playerSpeed, direction})  = player {player
 movePlayer _          player@(Player {playerSpeed, direction})  = player {playerSpeed = newSpeed}
     where 
         sp1      = mulSV 0.97 playerSpeed + rotateV (pi * direction / 180)(playerAcceleration, 0)        
-        newSpeed | magV sp1 >= maxSpeed = setMagnitudeVS maxSpeed sp1
+        newSpeed | magV sp1 >= maxSpeed = (mulSV maxSpeed . normalizeV) sp1
                  | otherwise            = sp1
 
 wrapPlayer :: Player -> Player
@@ -137,9 +121,23 @@ createThrustParticles (World{player, movementAction, rndGen}) | movementAction =
     
 --------------Player end -----------------------------------   
 
-setMagnitudeVS :: Float -> Vector -> Vector
-setMagnitudeVS mag = mulSV mag . normalizeV
+isHit :: (Location a, Location b) => Float -> a -> [b] -> (Bool, [b])
+isHit hitRadius p1 xs | hasCollided = (True, newList)
+                      | otherwise   = (False, xs)
+    where
+        list        = map (\x -> (hitCheck hitRadius p1 x, x)) xs
+        hasCollided = or $ map hit list
+        hit (x, _)  = x
+        newList     = (map snd . filter (not.hit)) list      
+                         
+hitCheck :: (Location a, Location b) => Float -> a -> b -> Bool
+hitCheck hitRadius p1 p2 = (magV (location p1 - location p2)) < hitRadius
 
+hitMultiplier :: (Location a, Location b) => a -> [b] -> (Int, [b])
+hitMultiplier p1 xs | collided  = (1, newList)
+                    | otherwise = (0, newList)
+    where
+    (collided, newList) = isHit 30 p1 xs
 --------------Enemy  start----------------------------------
 spawnRandomEnemy :: Float -> World -> [Enemy] -> StdGen -> (Enemy -> Player -> Float -> Enemy) -> ([Enemy], Float, StdGen)
 spawnRandomEnemy ellapsed world@(World {..}) xs stdGen behaviour
