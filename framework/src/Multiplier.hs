@@ -15,6 +15,7 @@ data Multiplier = Multiplier {
 instance Location Multiplier where {
     location = multiplierLocation
     }
+
 drawMultipliers :: Picture -> [Multiplier] -> Picture
 drawMultipliers pict xs = Pictures $ map (drawMultiplier pict) xs
 

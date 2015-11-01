@@ -44,7 +44,7 @@ data ShootAction    = Shoot      | DontShoot
 
 initial :: Int -> Picture -> Picture -> Picture -> World
 initial seed playerPng enemyPng multiplierPng = World {
-                        rndGen          = rndGen,
+                        rndGen          = rndGen,   
                         rotateAction    = NoRotation,
                         movementAction  = NoMovement,
                         shootAction     = DontShoot,
