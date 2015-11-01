@@ -120,7 +120,7 @@ createThrustParticles (World{player, movementAction, rndGen}) | movementAction =
         randParticles = generateRandom rndGen (randomizedParticle speedVar degreeVar lifeTimeVar particle) 30
     
 --------------Player end -----------------------------------   
-
+--------------Collision stuff-------------------------------
 isHit :: (Location a, Location b) => Float -> a -> [b] -> (Bool, [b])
 isHit hitRadius p1 xs | hasCollided = (True, newList)
                       | otherwise   = (False, xs)
@@ -138,6 +138,7 @@ hitMultiplier p1 xs | collided  = (1, newList)
                     | otherwise = (0, newList)
     where
     (collided, newList) = isHit 30 p1 xs
+--------------Collision stuff-------------------------------
 --------------Enemy  start----------------------------------
 spawnRandomEnemy :: Float -> World -> [Enemy] -> StdGen -> (Enemy -> Player -> Float -> Enemy) -> ([Enemy], Float, StdGen)
 spawnRandomEnemy ellapsed world@(World {..}) xs stdGen behaviour
